@@ -9,20 +9,20 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="bg-white sticky top-0 z-50">
+    <header className="bg-secondary-bg sticky top-0 z-50">
       <Container>
         <div className="flex items-center justify-between px-4 py-8 sm:px-6">
           {/* Logo */}
           <Link
             href="/"
-            className="text-2xl text-gray-600 font-semibold tracking-tight"
+            className="text-2xl text-primary font-semibold tracking-tight"
             onClick={() => setMobileMenuOpen(false)}
           >
             Mockupforest
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center space-x-6 text-gray-700">
+          <nav className="hidden md:flex items-center space-x-6 text-gray-900 font-semibold">
             <NavLink href="/">Home</NavLink>
             <NavLink href="/mockups">Mockups</NavLink>
             <NavLink href="/categories">Categories</NavLink>
