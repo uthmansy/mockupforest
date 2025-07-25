@@ -12,6 +12,10 @@ const nextConfig: NextConfig = {
   },
 
   // Add other config options below as needed
+
+  images: {
+    domains: ["source.unsplash.com", "cdn.pixabay.com", "plus.unsplash.com"],
+  },
 };
 
 export default nextConfig;
