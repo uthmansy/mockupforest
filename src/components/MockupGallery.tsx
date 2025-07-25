@@ -18,7 +18,7 @@ const generateMockups = (): Mockup[] => {
   return Array.from({ length: TOTAL_MOCKUPS }, (_, i) => ({
     id: `${i + 1}`,
     title: `Mockup #${i + 1}`,
-    thumbnailUrl: `https://plus.unsplash.com/premium_photo-1679913792906-13ccc5c84d44?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D`,
+    thumbnailUrl: `https://plus.unsplash.com/premium_photo-1722945721378-1c565f10859d?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D`,
   }));
 };
 

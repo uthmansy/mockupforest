@@ -2,6 +2,7 @@ import Container from "@/components/Container";
 import { Metadata } from "next";
 import { Search } from "lucide-react"; // optional icon
 import MockupGallery from "@/components/MockupGallery";
+import CategoriesList from "@/components/CategoriesList";
 
 export const metadata: Metadata = {
   title: "Free PSD Mockups",
@@ -35,7 +36,14 @@ export default function Home({
           </div>
         </Container>
       </section>
-      <section className="py-28">
+      <section>
+        <Container>
+          <div className="max-w-max mx-auto">
+            <CategoriesList />
+          </div>
+        </Container>
+      </section>
+      <section className="py-10">
         <Container>
           <MockupGallery searchParams={searchParams} />
         </Container>

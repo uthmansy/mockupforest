@@ -1,3 +1,6 @@
+import CategoriesList from "@/components/CategoriesList";
+import Container from "@/components/Container";
+import MockupGallery from "@/components/MockupGallery";
 import Link from "next/link";
 
 type Mockup = {
@@ -31,24 +34,28 @@ async function fetchMockups(): Promise<Mockup[]> {
   ];
 }
 
-export default async function MockupsPage() {
-  const mockups = await fetchMockups();
-
+export default async function MockupsPage({
+  searchParams,
+}: {
+  searchParams: { page?: string };
+}) {
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
-      <h1 className="text-3xl font-bold mb-6">All Free PSD Mockups</h1>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {mockups.map((mockup) => (
-          <Link href={`/mockups/${mockup.slug}`} key={mockup.id}>
-            <img
-              alt={mockup.title}
-              src={mockup.thumbnail_url}
-              className="h-48 w-full object-cover rounded-t"
-            />
-          </Link>
-        ))}
-      </div>
+      <section>
+        <Container>
+          <div className="max-w-max mx-auto">
+            <CategoriesList />
+          </div>
+        </Container>
+      </section>
+      <section className="py-5">
+        <Container>
+          <h1 className="text-3xl font-bold mb-10 text-center">
+            All Free PSD Mockups
+          </h1>
+          <MockupGallery searchParams={searchParams} />
+        </Container>
+      </section>
     </div>
   );
 }

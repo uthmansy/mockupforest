@@ -13,15 +13,12 @@ export default function PaginationControls({
   itemsPerPage,
 }: PaginationControlsProps) {
   const totalPages = Math.ceil(totalItems / itemsPerPage);
-  const midSize = 2; // number of pages to show around current
+  const midSize = 2;
 
-  // Build page list with first, dynamic middle, last
   const pages: (number | string)[] = [];
   pages.push(1);
 
-  if (currentPage - midSize > 2) {
-    pages.push("...");
-  }
+  if (currentPage - midSize > 2) pages.push("...");
 
   for (
     let i = Math.max(2, currentPage - midSize);
@@ -31,20 +28,15 @@ export default function PaginationControls({
     pages.push(i);
   }
 
-  if (currentPage + midSize < totalPages - 1) {
-    pages.push("...");
-  }
-
-  if (totalPages > 1) {
-    pages.push(totalPages);
-  }
+  if (currentPage + midSize < totalPages - 1) pages.push("...");
+  if (totalPages > 1) pages.push(totalPages);
 
   const renderPageLink = (page: number) => {
-    const href = page > 1 ? `?page=${page}` : "/";
+    const href = `?page=${page}`;
     const isActive = page === currentPage;
     return (
       <Link
-        key={`page-${page}`}
+        key={page}
         href={href}
         className={`px-3 py-1 rounded-md text-sm font-medium transition ${
           isActive
@@ -64,7 +56,7 @@ export default function PaginationControls({
     >
       {/* Previous Button */}
       <Link
-        href={currentPage > 1 ? `?page=${currentPage - 1}` : "#"}
+        href={currentPage > 1 ? `?page=${currentPage - 1}` : ""}
         className={`px-3 py-1 rounded-md text-sm font-medium transition ${
           currentPage === 1
             ? "bg-gray-200 text-gray-400 pointer-events-none"
@@ -87,7 +79,7 @@ export default function PaginationControls({
 
       {/* Next Button */}
       <Link
-        href={currentPage < totalPages ? `?page=${currentPage + 1}` : "#"}
+        href={currentPage < totalPages ? `?page=${currentPage + 1}` : ""}
         className={`px-3 py-1 rounded-md text-sm font-medium transition ${
           currentPage === totalPages
             ? "bg-gray-200 text-gray-400 pointer-events-none"
