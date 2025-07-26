@@ -1,6 +1,7 @@
 // components/Footer.tsx
 import Link from "next/link";
 import Container from "./Container";
+import Image from "next/image";
 
 export default function Footer() {
   return (
@@ -9,7 +10,14 @@ export default function Footer() {
         <div className="py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Branding */}
           <div>
-            <h2 className="text-2xl font-bold text-white mb-2">MockupForest</h2>
+            <Image
+              src="/dark-logo.png"
+              alt="MockupForest logo"
+              width={150}
+              height={50}
+              priority
+              className="mb-5"
+            />
             <p className="text-gray-300 text-sm">
               Your go-to source for high-quality PSD mockups. Elevate your
               design projects with professional assets.

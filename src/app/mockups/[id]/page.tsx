@@ -42,7 +42,7 @@ export default function MockupDetailPage({ params }: Props) {
         <div className="flex flex-col md:flex-row md:space-x-12">
           {/* Left: Image + Description */}
           <div className="flex-1">
-            <div className="relative w-full h-[450px] mb-8 rounded-2xl overflow-hidden">
+            <div className="relative w-full h-[450px] mb-8 rounded-lg overflow-hidden">
               <Image
                 src={mockup.imageUrl}
                 alt={mockup.title}
@@ -91,7 +91,7 @@ export default function MockupDetailPage({ params }: Props) {
                   {mockup.tags.map((tag) => (
                     <li
                       key={tag}
-                      className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm"
+                      className="bg-primary text-white px-3 py-1 rounded-full text-sm"
                     >
                       #{tag}
                     </li>

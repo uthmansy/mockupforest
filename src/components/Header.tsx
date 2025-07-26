@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import Container from "./Container";
+import Image from "next/image";
 
 const NAV_ITEMS = [
   { label: "Home", href: "/" },
@@ -22,9 +23,13 @@ export default function Header() {
         <div className="flex items-center justify-between py-6">
           {/* Logo */}
           <Link href="/" onClick={() => setMenuOpen(false)}>
-            <span className="text-2xl font-extrabold text-gradient bg-clip-text">
-              MockupForest
-            </span>
+            <Image
+              src="/logo.png"
+              alt="MockupForest logo"
+              width={150}
+              height={50}
+              priority
+            />
           </Link>
 
           {/* Desktop Nav & Search */}

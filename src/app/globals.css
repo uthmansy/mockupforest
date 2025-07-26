@@ -9,7 +9,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-primary: #d24e01;
-  --color-secondary-bg: #f9ddb1;
+  --color-secondary-bg: #ffe9c6;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -25,5 +25,5 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Inter, Arial, Helvetica, sans-serif;
-  font-size: calc(16px + 0.1vw);
+  font-size: calc(15px + 0.1vw);
 }
