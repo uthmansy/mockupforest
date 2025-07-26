@@ -25,7 +25,7 @@ export default function Home({
 
           {/* Search Bar */}
           <div className="max-w-2xl mx-auto mt-8">
-            <div className="flex items-center rounded-2xl border border-gray-300 bg-white px-4 py-3 shadow-md focus-within:ring-2 focus-within:ring-primary">
+            <div className="flex items-center rounded-3xl border border-gray-300 bg-white px-4 py-3 shadow-md focus-within:ring-2 focus-within:ring-primary">
               <Search className="text-gray-400 w-5 h-5 mr-3" />
               <input
                 type="text"

@@ -5,95 +5,138 @@ import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import Container from "./Container";
 
+const NAV_ITEMS = [
+  { label: "Home", href: "/" },
+  { label: "Mockups", href: "/mockups" },
+  { label: "Categories", href: "/categories" },
+  { label: "About", href: "/about" },
+  { label: "Contact", href: "/contact" },
+];
+
 export default function Header() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <header className="bg-secondary-bg sticky top-0 z-50">
+    <header className="sticky top-0 z-50 bg-white shadow-md">
       <Container>
-        <div className="flex items-center justify-between py-8">
+        <div className="flex items-center justify-between py-6">
           {/* Logo */}
-          <Link
-            href="/"
-            className="text-2xl text-primary font-semibold tracking-tight"
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            Mockupforest
+          <Link href="/" onClick={() => setMenuOpen(false)}>
+            <span className="text-2xl font-extrabold text-gradient bg-clip-text">
+              MockupForest
+            </span>
           </Link>
 
-          {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center space-x-6 text-gray-900 font-semibold">
-            <NavLink href="/">Home</NavLink>
-            <NavLink href="/mockups">Mockups</NavLink>
-            <NavLink href="/categories">Categories</NavLink>
-          </nav>
+          {/* Desktop Nav & Search */}
+          <div className="hidden lg:flex items-center space-x-8">
+            <nav className="flex items-center space-x-8">
+              {NAV_ITEMS.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="relative group font-medium text-gray-700 hover:text-gray-900 transition-colors"
+                >
+                  {item.label}
+                  <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-primary group-hover:w-full transition-all"></span>
+                </Link>
+              ))}
+            </nav>
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search mockups..."
+                className="pl-10 pr-4 py-2 w-64 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </span>
+            </div>
+          </div>
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2 rounded-md text-gray-700 hover:bg-gray-100 focus:outline-none transition"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="lg:hidden p-2 rounded-md text-gray-700 hover:bg-gray-100 transition"
+            onClick={() => setMenuOpen(true)}
             aria-label="Toggle menu"
           >
-            {mobileMenuOpen ? (
-              <X className="h-6 w-6" />
-            ) : (
-              <Menu className="h-6 w-6" />
-            )}
+            <Menu className="h-6 w-6" />
           </button>
         </div>
       </Container>
 
-      {/* Mobile Menu */}
-      {mobileMenuOpen && (
-        <div className="md:hidden bg-white border-t animate-slide-down">
-          <div className="p-4 space-y-3">
-            <MobileNavLink href="/" onClick={() => setMobileMenuOpen(false)}>
-              Home
-            </MobileNavLink>
-            <MobileNavLink
-              href="/mockups"
-              onClick={() => setMobileMenuOpen(false)}
+      {/* Mobile Fullscreen Menu */}
+      {menuOpen && (
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-95 backdrop-blur-md z-50 flex flex-col animate-fade-in">
+          <div className="flex items-center justify-between p-6">
+            <Link href="/" onClick={() => setMenuOpen(false)}>
+              <span className="text-2xl font-extrabold text-white">
+                MockupForest
+              </span>
+            </Link>
+            <button
+              className="p-2 text-white hover:text-gray-200 transition"
+              onClick={() => setMenuOpen(false)}
+              aria-label="Close menu"
             >
-              Mockups
-            </MobileNavLink>
-            <MobileNavLink
-              href="/categories"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Categories
-            </MobileNavLink>
+              <X className="h-6 w-6" />
+            </button>
           </div>
+          {/* Mobile Search */}
+          <div className="px-6 mb-6">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search mockups..."
+                className="pl-10 pr-4 py-2 w-full rounded-full border border-gray-700 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-primary"
+                onClick={() => {
+                  /* keep open */
+                }}
+              />
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </span>
+            </div>
+          </div>
+          <nav className="flex flex-col items-center justify-center flex-1 space-y-6">
+            {NAV_ITEMS.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setMenuOpen(false)}
+                className="text-2xl font-semibold text-white hover:text-primary transition-colors"
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
         </div>
       )}
     </header>
-  );
-}
-
-interface NavLinkProps {
-  href: string;
-  children: React.ReactNode;
-}
-
-function NavLink({ href, children }: NavLinkProps) {
-  return (
-    <Link href={href} className="hover:text-blue-600 transition-colors">
-      {children}
-    </Link>
-  );
-}
-
-interface MobileNavLinkProps extends NavLinkProps {
-  onClick: () => void;
-}
-
-function MobileNavLink({ href, children, onClick }: MobileNavLinkProps) {
-  return (
-    <Link
-      href={href}
-      className="block py-2 px-3 rounded-md text-gray-700 hover:bg-gray-100 transition"
-      onClick={onClick}
-    >
-      {children}
-    </Link>
   );
 }
