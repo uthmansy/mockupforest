@@ -39,7 +39,7 @@ export default function Header() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="relative group font-medium text-gray-700 hover:text-gray-900 transition-colors"
+                  className="relative group font-semibold text-gray-700 hover:text-gray-900 transition-colors"
                 >
                   {item.label}
                   <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-primary group-hover:w-full transition-all"></span>

@@ -1,6 +1,8 @@
-// components/MockupGallery.tsx
+import { supabase } from "@/lib/supabaseClient";
 import GalleryGrid from "./GalleryGrid";
 import PaginationControls from "./PaginationControls";
+
+export const revalidate = 60;
 
 export interface Mockup {
   id: string;
@@ -12,33 +14,37 @@ interface Props {
   searchParams: { page?: string };
 }
 
-const TOTAL_MOCKUPS = 100;
-
-const generateMockups = (): Mockup[] => {
-  return Array.from({ length: TOTAL_MOCKUPS }, (_, i) => ({
-    id: `${i + 1}`,
-    title: `Mockup #${i + 1}`,
-    thumbnailUrl: `https://plus.unsplash.com/premium_photo-1722945721378-1c565f10859d?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D`,
-  }));
-};
-
 export default async function MockupGallery({ searchParams }: Props) {
   const page = parseInt(searchParams.page || "1", 10);
   const itemsPerPage = 24;
+  const from = (page - 1) * itemsPerPage;
+  const to = from + itemsPerPage - 1;
 
-  const allMockups = generateMockups();
+  // Fetch paginated mockups
+  const { data, error, count } = await supabase
+    .from("mockups")
+    .select("id, title, preview_url", { count: "exact" })
+    .order("created_at", { ascending: false })
+    .range(from, to);
 
-  const paginated = allMockups.slice(
-    (page - 1) * itemsPerPage,
-    page * itemsPerPage
-  );
+  if (error) {
+    console.error("Error fetching mockups:", error.message);
+    return <p className="text-red-500">Failed to load mockups.</p>;
+  }
+
+  const mockups: Mockup[] =
+    data?.map((item) => ({
+      id: item.id,
+      title: item.title,
+      thumbnailUrl: item.preview_url ?? "/placeholder.jpg",
+    })) ?? [];
 
   return (
     <div className="space-y-10">
-      <GalleryGrid mockups={paginated} />
+      <GalleryGrid mockups={mockups} />
       <PaginationControls
         currentPage={page}
-        totalItems={TOTAL_MOCKUPS}
+        totalItems={count ?? 0}
         itemsPerPage={itemsPerPage}
       />
     </div>

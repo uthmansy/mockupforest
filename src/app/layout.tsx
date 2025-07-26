@@ -10,6 +10,11 @@ export const metadata: Metadata = {
   title: "Free PSD Mockups",
   description:
     "Download high-quality free PSD mockups for devices, branding, and more.",
+  icons: {
+    icon: "/favicon.ico", // primary favicon
+    shortcut: "/favicon-16x16.png",
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({

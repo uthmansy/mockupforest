@@ -13,8 +13,8 @@ export default function Footer() {
             <Image
               src="/dark-logo.png"
               alt="MockupForest logo"
-              width={150}
-              height={50}
+              width={120}
+              height={40}
               priority
               className="mb-5"
             />
