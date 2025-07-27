@@ -6,6 +6,7 @@ export const revalidate = 60;
 
 export interface Mockup {
   id: string;
+  slug: string;
   title: string;
   thumbnailUrl: string;
 }
@@ -23,7 +24,7 @@ export default async function MockupGallery({ searchParams }: Props) {
   // Fetch paginated mockups
   const { data, error, count } = await supabase
     .from("mockups")
-    .select("id, title, preview_url", { count: "exact" })
+    .select("id, title, preview_url, slug", { count: "exact" })
     .order("created_at", { ascending: false })
     .range(from, to);
 
@@ -35,6 +36,7 @@ export default async function MockupGallery({ searchParams }: Props) {
   const mockups: Mockup[] =
     data?.map((item) => ({
       id: item.id,
+      slug: item.slug,
       title: item.title,
       thumbnailUrl: item.preview_url ?? "/placeholder.jpg",
     })) ?? [];

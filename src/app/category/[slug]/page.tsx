@@ -32,7 +32,7 @@ export default async function CategorySlugPage({
 
   const { data, error, count } = await supabase
     .from("mockups")
-    .select("id, title, preview_url", { count: "exact" })
+    .select("id, title, preview_url,slug", { count: "exact" })
     .contains("categories", [normalizedSlug]) // use normalized slug here
     .order("created_at", { ascending: false })
     .range(from, to);
@@ -45,6 +45,7 @@ export default async function CategorySlugPage({
   const mockups =
     data?.map((item) => ({
       id: item.id,
+      slug: item.slug,
       title: item.title,
       thumbnailUrl: item.preview_url ?? "/placeholder.jpg",
     })) ?? [];

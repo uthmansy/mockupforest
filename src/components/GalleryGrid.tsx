@@ -14,7 +14,7 @@ export default function GalleryGrid({ mockups }: GalleryGridProps) {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {mockups.map((item) => (
           <div key={item.id} className="">
-            <Link href={`/mockups/${item.id}`}>
+            <Link href={`/mockups/${item.slug}`}>
               <div className="relative w-full h-64">
                 <Image
                   src={item.thumbnailUrl}
