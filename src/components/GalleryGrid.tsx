@@ -11,7 +11,7 @@ interface GalleryGridProps {
 export default function GalleryGrid({ mockups }: GalleryGridProps) {
   return (
     <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
         {mockups.map((item) => (
           <div key={item.id} className="">
             <Link href={`/mockups/${item.slug}`}>
@@ -21,7 +21,7 @@ export default function GalleryGrid({ mockups }: GalleryGridProps) {
                   alt={item.title}
                   fill
                   sizes="(max-width: 768px) 100vw, 33vw"
-                  className="object-cover  overflow-hidden rounded-md"
+                  className="object-cover  overflow-hidden"
                   quality={80}
                   priority={false}
                 />
