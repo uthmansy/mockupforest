@@ -25,7 +25,7 @@ export default async function MockupGallery({ searchParams }: Props) {
   const { data, error, count } = await supabase
     .from("mockups")
     .select("id, title, preview_url, slug", { count: "exact" })
-    .order("id", { ascending: false })
+    .order("created_at", { ascending: false })
     .range(from, to);
 
   if (error) {

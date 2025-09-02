@@ -38,7 +38,7 @@ export default function PaginationControls({
       <Link
         key={page}
         href={href}
-        className={`px-3 py-1 rounded-md text-sm font-medium transition ${
+        className={`px-3 py-1 text-sm font-medium transition ${
           isActive
             ? "bg-primary text-white"
             : "bg-white text-gray-700 hover:bg-gray-100"
@@ -57,7 +57,7 @@ export default function PaginationControls({
       {/* Previous Button */}
       <Link
         href={currentPage > 1 ? `?page=${currentPage - 1}` : ""}
-        className={`px-3 py-1 rounded-md text-sm font-medium transition ${
+        className={`px-3 py-1 text-sm font-medium transition ${
           currentPage === 1
             ? "bg-gray-200 text-gray-400 pointer-events-none"
             : "bg-primary text-white hover:bg-primary-dark"
@@ -80,7 +80,7 @@ export default function PaginationControls({
       {/* Next Button */}
       <Link
         href={currentPage < totalPages ? `?page=${currentPage + 1}` : ""}
-        className={`px-3 py-1 rounded-md text-sm font-medium transition ${
+        className={`px-3 py-1 text-sm font-medium transition ${
           currentPage === totalPages
             ? "bg-gray-200 text-gray-400 pointer-events-none"
             : "bg-primary text-white hover:bg-primary-dark"

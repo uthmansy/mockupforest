@@ -15,13 +15,13 @@ export default function GalleryGrid({ mockups }: GalleryGridProps) {
         {mockups.map((item) => (
           <div key={item.id} className="">
             <Link href={`/mockups/${item.slug}`}>
-              <div className="relative w-full h-64">
+              <div className="relative w-full aspect-square md:aspect-auto md:h-72">
                 <Image
                   src={item.thumbnailUrl}
                   alt={item.title}
                   fill
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                  className="object-cover  overflow-hidden"
+                  sizes="(max-width: 768px) 100vw, 100vw"
+                  className="object-cover overflow-hidden"
                   quality={80}
                   priority={false}
                 />
