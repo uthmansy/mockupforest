@@ -20,7 +20,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 bg-white shadow-md">
       <Container>
-        <div className="flex items-center justify-between py-3">
+        <div className="flex items-center justify-between py-5">
           {/* Logo */}
           <Link href="/" onClick={() => setMenuOpen(false)}>
             <Image
@@ -39,7 +39,7 @@ export default function Header() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="relative group text-black hover:text-gray-900 transition-colors"
+                  className="relative group text-black hover:text-gray-900 transition-colors uppercase"
                 >
                   {item.label}
                   <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-primary group-hover:w-full transition-all"></span>
@@ -50,7 +50,7 @@ export default function Header() {
               <input
                 type="text"
                 placeholder="Search mockups..."
-                className="pl-10 pr-4 py-2 w-64 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary"
+                className="pl-10 pr-4 py-2 w-64 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary"
               />
               <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
                 <svg
@@ -105,7 +105,7 @@ export default function Header() {
               <input
                 type="text"
                 placeholder="Search mockups..."
-                className="pl-10 pr-4 py-2 w-full rounded-full border border-gray-700 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-primary"
+                className="pl-10 pr-4 py-2 w-full border border-gray-700 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-primary"
                 onClick={() => {
                   /* keep open */
                 }}

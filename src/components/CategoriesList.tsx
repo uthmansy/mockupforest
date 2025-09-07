@@ -23,7 +23,7 @@ const categories: Category[] = [
 export default function CategoriesList() {
   return (
     <div className="overflow-x-auto py-8">
-      <ul className="flex space-x-6 px-6">
+      <ul className="flex space-x-6 px-6 list-none">
         {categories.map(({ id, name, slug, Icon }) => (
           <li key={id} className="flex-shrink-0">
             <Link

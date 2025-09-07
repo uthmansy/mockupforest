@@ -26,8 +26,8 @@ export default function GalleryGrid({ mockups }: GalleryGridProps) {
                   priority={false}
                 />
               </div>
-              <div className="py-4">
-                <h3 className="text-sm truncate">{item.title}</h3>
+              <div className="">
+                <h3 className="sr-only">{item.title}</h3>
               </div>
             </Link>
           </div>

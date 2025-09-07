@@ -39,14 +39,14 @@ export default async function MockupDetailPage({ params }: Props) {
   return (
     <main className="py-12 mb-12">
       <Container>
-        <h1 className="text-2xl font-semibold text-gray-900 mb-8">
+        <h1 className="text-2xl font-medium text-gray-900 mb-8">
           {mockup.title}
         </h1>
 
         <div className="flex flex-col md:flex-row md:space-x-12">
           {/* Left: Image and Description */}
           <div className="flex-1">
-            <div className="relative w-full h-[450px] mb-8 rounded-lg overflow-hidden">
+            <div className="relative w-full aspect-[5/4] mb-8">
               <Image
                 src={mockup.preview_url || "/placeholder.jpg"}
                 alt={mockup.title}
@@ -57,8 +57,8 @@ export default async function MockupDetailPage({ params }: Props) {
               />
             </div>
 
-            <div className="prose prose-lg text-gray-700">
-              <p>{mockup.description}</p>
+            <div className="prose prose-lg text-gray-700 single-body">
+              <p className="text-gray-400">{mockup.description}</p>
               {mockup.body && (
                 <div dangerouslySetInnerHTML={{ __html: mockup.body }} />
               )}
@@ -71,7 +71,7 @@ export default async function MockupDetailPage({ params }: Props) {
               {mockup.download_url && (
                 <a
                   href={mockup.download_url}
-                  className="block w-full text-center bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-dark transition"
+                  className="block w-full text-center bg-primary text-white px-6 py-3 font-medium hover:bg-primary-dark transition"
                 >
                   Download PSD
                 </a>
@@ -101,11 +101,11 @@ export default async function MockupDetailPage({ params }: Props) {
                   <h2 className="text-lg font-semibold text-gray-800 mb-2">
                     Tags
                   </h2>
-                  <ul className="flex flex-wrap gap-2">
+                  <ul className="flex flex-wrap gap-2 px-0 list-none">
                     {mockup.tags.map((tag: string) => (
                       <li
                         key={tag}
-                        className="bg-primary text-white px-3 py-1 rounded-full text-sm"
+                        className="bg-primary text-white px-3 py-1 text-sm"
                       >
                         #{tag}
                       </li>
@@ -115,7 +115,7 @@ export default async function MockupDetailPage({ params }: Props) {
               )}
 
               {/* Metadata */}
-              <div className="bg-gray-100 p-6 rounded-lg">
+              <div className="bg-gray-100 p-6">
                 <ul className="text-gray-700 space-y-3">
                   <li className="flex justify-between">
                     <span className="font-bold">File Types:</span>
