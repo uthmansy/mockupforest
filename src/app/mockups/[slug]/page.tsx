@@ -1,4 +1,5 @@
 import Container from "@/components/Container";
+import GalleryGrid from "@/components/GalleryGrid";
 import { supabase } from "@/lib/supabaseClient";
 import { Metadata } from "next";
 import Image from "next/image";
@@ -22,6 +23,30 @@ async function fetchMockupBySlug(slug: string) {
   return data;
 }
 
+async function fetchRelatedMockups(categories: string[], currentSlug: string) {
+  if (!categories?.length) return [];
+
+  const firstCategory = categories?.[0]; // take first from current mockup
+
+  const { data, error } = await supabase
+    .from("mockups")
+    .select("id, title, preview_url, slug, categories")
+    .overlaps("categories", [firstCategory])
+    .neq("slug", currentSlug)
+    .order("categories", {
+      ascending: true,
+      foreignTable: undefined,
+    })
+    .limit(6);
+
+  if (error) {
+    console.error("Error fetching related mockups:", error.message);
+    return [];
+  }
+
+  return data ?? [];
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const mockup = await fetchMockupBySlug(params.slug);
   if (!mockup) return { title: "Mockup Not Found" };
@@ -34,6 +59,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function MockupDetailPage({ params }: Props) {
   const mockup = await fetchMockupBySlug(params.slug);
+  const relatedMockups = await fetchRelatedMockups(
+    mockup.categories || [],
+    mockup.slug
+  );
+
   if (!mockup) return notFound();
 
   return (
@@ -59,6 +89,7 @@ export default async function MockupDetailPage({ params }: Props) {
 
             <div className="prose prose-lg text-gray-700 single-body">
               <p className="text-gray-400">{mockup.description}</p>
+              <div className="border-t border-neutral-300 mb-12"></div>
               {mockup.body && (
                 <div dangerouslySetInnerHTML={{ __html: mockup.body }} />
               )}
@@ -115,8 +146,8 @@ export default async function MockupDetailPage({ params }: Props) {
               )}
 
               {/* Metadata */}
-              <div className="bg-gray-100 p-6">
-                <ul className="text-gray-700 space-y-3">
+              <div className="bg-gray-100 px-6 py-8 text-sm">
+                <ul className="text-gray-700 space-y-3 pl-0">
                   <li className="flex justify-between">
                     <span className="font-bold">File Types:</span>
                     <span className="text-gray-500">
@@ -141,7 +172,7 @@ export default async function MockupDetailPage({ params }: Props) {
                   </li>
                   <li className="flex justify-between">
                     <span className="font-bold">License:</span>
-                    <span className="text-gray-500">
+                    <span className="text-gray-500 text-right">
                       {mockup.license || "Free"}
                     </span>
                   </li>
@@ -156,6 +187,21 @@ export default async function MockupDetailPage({ params }: Props) {
             </div>
           </aside>
         </div>
+        {relatedMockups.length > 0 && (
+          <section className="mt-16">
+            <h2 className="text-xl font-semibold text-gray-800 mb-6">
+              Related Mockups
+            </h2>
+            <GalleryGrid
+              mockups={relatedMockups.map((item) => ({
+                id: item.id,
+                slug: item.slug,
+                title: item.title,
+                thumbnailUrl: item.preview_url ?? "/placeholder.jpg",
+              }))}
+            />
+          </section>
+        )}
       </Container>
     </main>
   );

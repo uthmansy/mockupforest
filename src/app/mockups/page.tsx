@@ -40,7 +40,7 @@ export default async function MockupsPage({
   searchParams: { page?: string };
 }) {
   return (
-    <div className="max-w-7xl mx-auto px-6 py-8">
+    <div className="py-8">
       <section>
         <Container>
           <div className="max-w-max mx-auto">

@@ -5,9 +5,9 @@ import Image from "next/image";
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-900 border-t border-gray-700">
+    <footer className="site-footer bg-black border-t border-gray-700">
       <Container>
-        <div className="py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="py-24 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Branding */}
           <div>
             <Image
@@ -38,11 +38,7 @@ export default function Footer() {
                   Blog
                 </Link>
               </li>
-              <li>
-                <Link href="/careers" className="hover:text-white transition">
-                  Careers
-                </Link>
-              </li>
+
               <li>
                 <Link href="/contact" className="hover:text-white transition">
                   Contact
@@ -80,21 +76,7 @@ export default function Footer() {
             </h3>
             <div className="flex space-x-4 mb-6 text-gray-400">
               <Link
-                href="https://twitter.com"
-                aria-label="Twitter"
-                className="hover:text-white transition"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="currentColor"
-                  className="w-6 h-6"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M24 4.557a9.993 9.993 0 0 1-2.828.775 4.932 4.932 0 0 0 2.165-2.724..." />
-                </svg>
-              </Link>
-              <Link
-                href="https://facebook.com"
+                href="https://facebook.com/mockupforest"
                 aria-label="Facebook"
                 className="hover:text-white transition"
               >
@@ -108,7 +90,7 @@ export default function Footer() {
                 </svg>
               </Link>
               <Link
-                href="https://instagram.com"
+                href="https://instagram.com/mockupforest"
                 aria-label="Instagram"
                 className="hover:text-white transition"
               >
@@ -129,11 +111,11 @@ export default function Footer() {
               <input
                 type="email"
                 placeholder="Your email"
-                className="w-full px-4 py-2 border border-gray-700 bg-gray-800 text-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent placeholder-gray-500 mb-3 sm:mb-0 sm:mr-2"
+                className="w-full px-4 py-2 border border-gray-700 bg-gray-800 text-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent placeholder-gray-500 mb-3 sm:mb-0 sm:mr-2"
               />
               <button
                 type="submit"
-                className="px-5 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark transition"
+                className="px-5 py-2 bg-primary text-white  font-medium hover:bg-primary-dark transition"
               >
                 Subscribe
               </button>

@@ -94,3 +94,12 @@ p {
 ol {
   @apply font-medium;
 } */
+
+.site-footer ul,
+ol {
+  @apply list-none pl-0;
+}
+
+.site-footer a {
+  @apply text-inherit hover:text-white;
+}
