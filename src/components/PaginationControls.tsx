@@ -1,16 +1,18 @@
-// components/PaginationControls.tsx (Server Component)
+// components/PaginationControls.tsx
 import Link from "next/link";
 
 interface PaginationControlsProps {
   currentPage: number;
   totalItems: number;
   itemsPerPage: number;
+  query?: string; // ✅ optional
 }
 
 export default function PaginationControls({
   currentPage,
   totalItems,
   itemsPerPage,
+  query,
 }: PaginationControlsProps) {
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const midSize = 2;
@@ -31,8 +33,16 @@ export default function PaginationControls({
   if (currentPage + midSize < totalPages - 1) pages.push("...");
   if (totalPages > 1) pages.push(totalPages);
 
+  // ✅ helper to build URLs consistently
+  const buildHref = (page: number) => {
+    const params = new URLSearchParams();
+    if (query) params.set("query", query);
+    params.set("page", page.toString());
+    return `?${params.toString()}`;
+  };
+
   const renderPageLink = (page: number) => {
-    const href = `?page=${page}`;
+    const href = buildHref(page);
     const isActive = page === currentPage;
     return (
       <Link
@@ -56,7 +66,7 @@ export default function PaginationControls({
     >
       {/* Previous Button */}
       <Link
-        href={currentPage > 1 ? `?page=${currentPage - 1}` : ""}
+        href={currentPage > 1 ? buildHref(currentPage - 1) : ""}
         className={`px-4 py-2 text-sm font-medium transition ${
           currentPage === 1
             ? "bg-gray-200 text-gray-400 pointer-events-none"
@@ -79,7 +89,7 @@ export default function PaginationControls({
 
       {/* Next Button */}
       <Link
-        href={currentPage < totalPages ? `?page=${currentPage + 1}` : ""}
+        href={currentPage < totalPages ? buildHref(currentPage + 1) : ""}
         className={`px-4 py-2 text-sm font-medium transition ${
           currentPage === totalPages
             ? "bg-gray-200 text-gray-400 pointer-events-none"
