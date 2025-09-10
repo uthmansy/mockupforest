@@ -54,7 +54,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       <section className="py-5">
         <Container>
           <h1 className="text-3xl font-medium mb-10 text-center">
-            Search Results for: <span className="text-primary">{query}</span>
+            Search Results: <span className="text-primary">{query}</span>
           </h1>
 
           {loading && <p className="text-center">Loading...</p>}
