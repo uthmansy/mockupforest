@@ -1,11 +1,7 @@
 // app/search/page.tsx
-"use client";
-
-import { Suspense, useEffect, useState } from "react";
 import Container from "@/components/Container";
 import GalleryGrid from "@/components/GalleryGrid";
 import PaginationControls from "@/components/PaginationControls";
-import { useSearchParams } from "next/navigation";
 import { algoliaResponse } from "@/lib/algoliaSearch";
 
 export interface Mockup {
@@ -15,49 +11,43 @@ export interface Mockup {
   thumbnailUrl: string;
 }
 
-function SearchContent() {
-  const searchParams = useSearchParams();
-  const query = searchParams.get("query") ?? "";
-  const pageParam = parseInt(searchParams.get("page") ?? "1", 10);
+interface SearchPageProps {
+  searchParams: Promise<{ query?: string; page?: string }>;
+}
+
+export default async function SearchPage({ searchParams }: SearchPageProps) {
+  // Await the searchParams promise
+  const params = await searchParams;
+  const query = params.query ?? "";
+  const pageParam = parseInt(params.page ?? "1", 10);
   const itemsPerPage = 18;
 
-  const [results, setResults] = useState<Mockup[]>([]);
-  const [totalHits, setTotalHits] = useState(0);
-  const [loading, setLoading] = useState(false);
+  let results: Mockup[] = [];
+  let totalHits = 0;
+  let loading = false;
 
-  useEffect(() => {
-    const fetchResults = async () => {
-      if (!query) {
-        setResults([]);
-        setTotalHits(0);
-        return;
-      }
+  if (query) {
+    loading = true;
+    try {
+      const response = await algoliaResponse({
+        query,
+        page: pageParam - 1,
+        hitsPerPage: itemsPerPage,
+      });
 
-      setLoading(true);
-      try {
-        const response = await algoliaResponse({
-          query,
-          page: pageParam - 1,
-          hitsPerPage: itemsPerPage,
-        });
+      results = response.hits.map((hit: any) => ({
+        id: hit.objectID,
+        slug: hit.slug,
+        title: hit.title,
+        thumbnailUrl: hit.preview_url ?? "/placeholder.jpg",
+      }));
 
-        const mappedResults = response.hits.map((hit: any) => ({
-          id: hit.objectID,
-          slug: hit.slug,
-          title: hit.title,
-          thumbnailUrl: hit.preview_url ?? "/placeholder.jpg",
-        }));
-
-        setResults(mappedResults);
-        setTotalHits(response.nbHits ?? 0);
-      } catch (err) {
-        console.error("Error fetching search results:", err);
-      }
-      setLoading(false);
-    };
-
-    fetchResults();
-  }, [query, pageParam]);
+      totalHits = response.nbHits ?? 0;
+    } catch (err) {
+      console.error("Error fetching search results:", err);
+    }
+    loading = false;
+  }
 
   return (
     <div className="py-8">
@@ -90,20 +80,5 @@ function SearchContent() {
   );
 }
 
-export default function SearchPage() {
-  return (
-    <Suspense
-      fallback={
-        <div className="py-8">
-          <Container>
-            <div className="text-center py-10">Loading search results...</div>
-          </Container>
-        </div>
-      }
-    >
-      <SearchContent />
-    </Suspense>
-  );
-}
-
+// This ensures the page is dynamic and not statically optimized
 export const dynamic = "force-dynamic";
