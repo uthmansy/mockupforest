@@ -12,9 +12,7 @@ export default function CategoryIndexPage() {
     <main className="py-24">
       <Container>
         <div className="max-w-max mx-auto">
-          <h1 className="text-3xl font-bold text-gray-900 mb-6 text-center">
-            Categories
-          </h1>
+          <h1 className="text-3xl mb-6 text-center">Categories</h1>
           {/* Horizontal list of categories */}
           <CategoriesList />
         </div>

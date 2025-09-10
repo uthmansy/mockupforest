@@ -40,10 +40,10 @@ export default function Header() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="relative group text-black hover:text-gray-900 transition-colors uppercase"
+                  className="relative group text-black hover:text-gray-900 transition-colors uppercase text-sm font-light"
                 >
                   {item.label}
-                  <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-primary group-hover:w-full transition-all"></span>
+                  <span className="absolute left-0 -bottom-1 w-0 h-[1.5px] bg-primary group-hover:w-full transition-all"></span>
                 </Link>
               ))}
             </nav>

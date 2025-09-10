@@ -18,7 +18,7 @@ export default function HeroSearch() {
   return (
     <section className="py-16 text-center bg-secondary-bg">
       <Container>
-        <h1 className="max-w-screen-md mx-auto text-2xl md:text-3xl lg:text-5xl font-bold mb-6">
+        <h1 className="max-w-screen-md mx-auto text-2xl md:text-3xl lg:text-5xl font-light mb-6">
           Explore our curated collection of high-quality PSD mockups.
         </h1>
 

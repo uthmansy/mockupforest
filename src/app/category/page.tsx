@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 export default function CategoryIndexPage() {
   return (
     <main className="max-w-7xl mx-auto px-6 py-12">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">Categories</h1>
+      <h1 className="text-3xl mb-6">Categories</h1>
       {/* Horizontal list of categories */}
       <CategoriesList />
     </main>

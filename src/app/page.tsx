@@ -1,6 +1,5 @@
 import Container from "@/components/Container";
 import { Metadata } from "next";
-import { Search } from "lucide-react"; // optional icon
 import MockupGallery from "@/components/MockupGallery";
 import CategoriesList from "@/components/CategoriesList";
 import HeroSearch from "@/components/HeroSearch";

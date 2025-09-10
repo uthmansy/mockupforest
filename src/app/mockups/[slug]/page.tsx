@@ -69,9 +69,7 @@ export default async function MockupDetailPage({ params }: Props) {
   return (
     <main className="py-12 mb-12">
       <Container>
-        <h1 className="text-2xl font-medium text-gray-900 mb-8">
-          {mockup.title}
-        </h1>
+        <h1 className="text-2xl text-gray-900 mb-8">{mockup.title}</h1>
 
         <div className="flex flex-col md:flex-row md:space-x-12">
           {/* Left: Image and Description */}
@@ -102,7 +100,7 @@ export default async function MockupDetailPage({ params }: Props) {
               {mockup.download_url && (
                 <a
                   href={mockup.download_url}
-                  className="block w-full text-center bg-primary text-white px-6 py-3 font-medium hover:bg-primary-dark transition"
+                  className="block w-full text-center bg-primary text-white px-6 py-3 uppercase text-sm font-normal hover:bg-primary-dark transition"
                 >
                   Download PSD
                 </a>
@@ -149,35 +147,35 @@ export default async function MockupDetailPage({ params }: Props) {
               <div className="bg-gray-100 px-6 py-8 text-sm">
                 <ul className="text-gray-700 space-y-3 pl-0">
                   <li className="flex justify-between">
-                    <span className="font-bold">File Types:</span>
+                    <span className="">File Types:</span>
                     <span className="text-gray-500">
                       {mockup.file_type || "PSD"}
                     </span>
                   </li>
                   <li className="flex justify-between">
-                    <span className="font-bold">File Size:</span>
+                    <span className="">File Size:</span>
                     <span className="text-gray-500">
                       {mockup.file_size || "N/A"}
                     </span>
                   </li>
                   <li className="flex justify-between">
-                    <span className="font-bold">Dimensions:</span>
+                    <span className="">Dimensions:</span>
                     <span className="text-gray-500">
                       {mockup.file_dimensions || "N/A"}
                     </span>
                   </li>
                   <li className="flex justify-between">
-                    <span className="font-bold">DPI:</span>
+                    <span className="">DPI:</span>
                     <span className="text-gray-500">{mockup.dpi || "N/A"}</span>
                   </li>
                   <li className="flex justify-between">
-                    <span className="font-bold">License:</span>
+                    <span className="">License:</span>
                     <span className="text-gray-500 text-right">
                       {mockup.license || "Free"}
                     </span>
                   </li>
                   <li className="flex justify-between">
-                    <span className="font-bold">Author:</span>
+                    <span className="">Author:</span>
                     <span className="text-gray-500">
                       {mockup.author || "Anonymous"}
                     </span>

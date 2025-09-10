@@ -28,12 +28,12 @@ export default function CategoriesList() {
           <li key={id} className="flex-shrink-0">
             <Link
               href={`/category/${slug}`}
-              className="flex flex-col items-center text-center text-gray-700 hover:text-primary transition"
+              className="flex flex-col items-center text-center text-black hover:text-primary transition"
             >
               <div className="w-16 h-16 mb-2 p-3 rounded-full bg-gray-100 flex items-center justify-center">
                 <Icon className="w-8 h-8 text-primary" />
               </div>
-              <span className="text-sm font-medium">{name}</span>
+              <span className="text-sm uppercase">{name}</span>
             </Link>
           </li>
         ))}

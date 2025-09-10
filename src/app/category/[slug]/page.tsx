@@ -52,7 +52,7 @@ export default async function CategorySlugPage({
 
   return (
     <main className="max-w-7xl mx-auto px-6 py-12">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6 capitalize">
+      <h1 className="text-3xl text-gray-900 mb-6 capitalize">
         {normalizedSlug}
       </h1>
 
