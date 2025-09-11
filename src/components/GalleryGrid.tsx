@@ -27,7 +27,9 @@ export default function GalleryGrid({ mockups }: GalleryGridProps) {
                 />
               </div>
               <div className="">
-                <h3 className="sr-only">{item.title}</h3>
+                <h3 className="truncate text-[16px] text-sage-dark mb-0 py-5 bg-neutral-100 px-3">
+                  {item.title}
+                </h3>
               </div>
             </Link>
           </div>

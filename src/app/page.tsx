@@ -17,15 +17,17 @@ export default function Home({
 }) {
   return (
     <>
-      <HeroSearch />
-      <section>
+      <section className="mb-10">
+        <HeroSearch />
+      </section>
+      <section className="mb-10">
         <Container>
           <div className="max-w-max mx-auto">
             <CategoriesList />
           </div>
         </Container>
       </section>
-      <section className="py-10">
+      <section className="mb-10">
         <Container>
           <MockupGallery searchParams={searchParams} />
         </Container>

@@ -5,6 +5,7 @@ import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { CiFileOn, CiImageOn, CiSquareCheck } from "react-icons/ci";
 
 export const revalidate = 60;
 
@@ -109,27 +110,25 @@ export default async function MockupDetailPage({ params }: Props) {
               {/* Categories */}
               {mockup.categories?.length > 0 && (
                 <div className="text-sm">
-                  <span className="font-semibold text-gray-700">
-                    Categories:&nbsp;
-                  </span>
-                  {mockup.categories.map((cat: string) => (
-                    <Link
-                      key={cat}
-                      href={`/category/${cat.toLowerCase()}`}
-                      className="text-primary hover:underline mr-2"
-                    >
-                      {cat}
-                    </Link>
-                  ))}
+                  <span className="uppercase text-lg">Categories:&nbsp;</span>
+                  <div>
+                    {mockup.categories.map((cat: string) => (
+                      <Link
+                        key={cat}
+                        href={`/category/${cat.toLowerCase()}`}
+                        className="text-primary hover:underline mr-2"
+                      >
+                        {cat}
+                      </Link>
+                    ))}
+                  </div>
                 </div>
               )}
 
               {/* Tags */}
               {mockup.tags?.length > 0 && (
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-800 mb-2">
-                    Tags
-                  </h2>
+                  <h2 className="text-lg uppercase mb-2">Tags</h2>
                   <ul className="flex flex-wrap gap-2 px-0 list-none">
                     {mockup.tags.map((tag: string) => (
                       <li
@@ -144,38 +143,41 @@ export default async function MockupDetailPage({ params }: Props) {
               )}
 
               {/* Metadata */}
-              <div className="bg-gray-100 px-6 py-8 text-sm">
-                <ul className="text-gray-700 space-y-3 pl-0">
-                  <li className="flex justify-between">
-                    <span className="">File Types:</span>
+              <div className="bg-gray-100 px-7 py-10 text-sm">
+                <ul className="text-gray-700 space-y-3 pl-0 mb-0">
+                  <li className="flex space-x-3 items-center">
+                    <CiSquareCheck />
                     <span className="text-gray-500">
                       {mockup.file_type || "PSD"}
                     </span>
                   </li>
-                  <li className="flex justify-between">
-                    <span className="">File Size:</span>
+                  <li className="flex space-x-3 items-center">
+                    <CiSquareCheck />
                     <span className="text-gray-500">
                       {mockup.file_size || "N/A"}
                     </span>
                   </li>
-                  <li className="flex justify-between">
-                    <span className="">Dimensions:</span>
+                  <li className="flex space-x-3 items-center">
+                    <CiSquareCheck />
                     <span className="text-gray-500">
                       {mockup.file_dimensions || "N/A"}
                     </span>
                   </li>
-                  <li className="flex justify-between">
-                    <span className="">DPI:</span>
-                    <span className="text-gray-500">{mockup.dpi || "N/A"}</span>
-                  </li>
-                  <li className="flex justify-between">
-                    <span className="">License:</span>
-                    <span className="text-gray-500 text-right">
-                      {mockup.license || "Free"}
+                  <li className="flex space-x-3 items-center">
+                    <CiSquareCheck />
+                    <span className="text-gray-500">
+                      {mockup.dpi || "N/A"} DPI
                     </span>
                   </li>
-                  <li className="flex justify-between">
-                    <span className="">Author:</span>
+                  <li className="flex space-x-3 items-center">
+                    <CiSquareCheck />
+                    <span className="text-gray-500 text-right">
+                      {/* {mockup.license || "Free"} */}
+                      Personal & Commercial
+                    </span>
+                  </li>
+                  <li className="flex space-x-3 items-center">
+                    <CiSquareCheck />
                     <span className="text-gray-500">
                       {mockup.author || "Anonymous"}
                     </span>
@@ -187,9 +189,7 @@ export default async function MockupDetailPage({ params }: Props) {
         </div>
         {relatedMockups.length > 0 && (
           <section className="mt-16">
-            <h2 className="text-xl font-semibold text-gray-800 mb-6">
-              Related Mockups
-            </h2>
+            <h2 className="text-xl text-gray-800 mb-6">Related Mockups</h2>
             <GalleryGrid
               mockups={relatedMockups.map((item) => ({
                 id: item.id,
