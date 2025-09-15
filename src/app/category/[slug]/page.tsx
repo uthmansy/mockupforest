@@ -53,7 +53,7 @@ export default async function CategorySlugPage({
     })) ?? [];
 
   return (
-    <main>
+    <main className="py-16">
       <Container>
         <h1 className="text-3xl text-gray-900 mb-6 capitalize">
           {normalizedSlug}
