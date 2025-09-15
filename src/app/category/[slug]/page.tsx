@@ -3,6 +3,7 @@ import { Metadata } from "next";
 import { supabase } from "@/lib/supabaseClient";
 import GalleryGrid from "@/components/GalleryGrid";
 import PaginationControls from "@/components/PaginationControls";
+import Container from "@/components/Container";
 
 interface Props {
   params: { slug: string };
@@ -32,7 +33,7 @@ export default async function CategorySlugPage({
 
   const { data, error, count } = await supabase
     .from("mockups")
-    .select("id, title, preview_url,slug", { count: "exact" })
+    .select("id, categories, title, preview_url,slug", { count: "exact" })
     .contains("categories", [normalizedSlug]) // use normalized slug here
     .order("created_at", { ascending: false })
     .range(from, to);
@@ -46,23 +47,26 @@ export default async function CategorySlugPage({
     data?.map((item) => ({
       id: item.id,
       slug: item.slug,
+      categories: item.categories,
       title: item.title,
       thumbnailUrl: item.preview_url ?? "/placeholder.jpg",
     })) ?? [];
 
   return (
-    <main className="max-w-7xl mx-auto px-6 py-12">
-      <h1 className="text-3xl text-gray-900 mb-6 capitalize">
-        {normalizedSlug}
-      </h1>
+    <main>
+      <Container>
+        <h1 className="text-3xl text-gray-900 mb-6 capitalize">
+          {normalizedSlug}
+        </h1>
 
-      <GalleryGrid mockups={mockups} />
+        <GalleryGrid mockups={mockups} />
 
-      <PaginationControls
-        currentPage={page}
-        totalItems={count ?? 0}
-        itemsPerPage={itemsPerPage}
-      />
+        <PaginationControls
+          currentPage={page}
+          totalItems={count ?? 0}
+          itemsPerPage={itemsPerPage}
+        />
+      </Container>
     </main>
   );
 }

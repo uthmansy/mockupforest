@@ -31,7 +31,7 @@ async function fetchRelatedMockups(categories: string[], currentSlug: string) {
 
   const { data, error } = await supabase
     .from("mockups")
-    .select("id, title, preview_url, slug, categories")
+    .select("id, categories, title, preview_url, slug, categories")
     .overlaps("categories", [firstCategory])
     .neq("slug", currentSlug)
     .order("categories", {
@@ -195,6 +195,7 @@ export default async function MockupDetailPage({ params }: Props) {
                 id: item.id,
                 slug: item.slug,
                 title: item.title,
+                categories: item.categories,
                 thumbnailUrl: item.preview_url ?? "/placeholder.jpg",
               }))}
             />

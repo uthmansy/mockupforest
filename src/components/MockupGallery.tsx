@@ -9,6 +9,7 @@ export interface Mockup {
   slug: string;
   title: string;
   thumbnailUrl: string;
+  categories?: string[];
 }
 
 interface Props {
@@ -24,7 +25,7 @@ export default async function MockupGallery({ searchParams }: Props) {
   // Fetch paginated mockups
   const { data, error, count } = await supabase
     .from("mockups")
-    .select("id, title, preview_url, slug", { count: "exact" })
+    .select("id, title, preview_url, slug, categories", { count: "exact" })
     .order("created_at", { ascending: false })
     .range(from, to);
 
@@ -39,6 +40,7 @@ export default async function MockupGallery({ searchParams }: Props) {
       slug: item.slug,
       title: item.title,
       thumbnailUrl: item.preview_url ?? "/placeholder.jpg",
+      categories: item.categories,
     })) ?? [];
 
   return (
