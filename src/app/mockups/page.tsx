@@ -1,5 +1,7 @@
 import CategoriesList from "@/components/CategoriesList";
 import Container from "@/components/Container";
+import Footer from "@/components/Footer";
+import Header from "@/components/Header";
 import MockupGallery from "@/components/MockupGallery";
 import Link from "next/link";
 
@@ -40,20 +42,24 @@ export default async function MockupsPage({
   searchParams: { page?: string };
 }) {
   return (
-    <div className="py-8">
-      <section>
-        <Container>
-          <div className="max-w-max mx-auto">
-            <CategoriesList />
-          </div>
-        </Container>
-      </section>
-      <section className="py-5">
-        <Container>
-          <h1 className="text-2xl mb-10">All Free PSD Mockups</h1>
-          <MockupGallery searchParams={searchParams} />
-        </Container>
-      </section>
-    </div>
+    <>
+      <Header />
+      <div className="py-8">
+        <section>
+          <Container>
+            <div className="max-w-max mx-auto">
+              <CategoriesList />
+            </div>
+          </Container>
+        </section>
+        <section className="py-5">
+          <Container>
+            <h1 className="text-2xl mb-10">All Free PSD Mockups</h1>
+            <MockupGallery searchParams={searchParams} />
+          </Container>
+        </section>
+      </div>
+      <Footer />
+    </>
   );
 }

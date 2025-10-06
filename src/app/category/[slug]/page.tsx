@@ -4,6 +4,8 @@ import { supabase } from "@/lib/supabaseClient";
 import GalleryGrid from "@/components/GalleryGrid";
 import PaginationControls from "@/components/PaginationControls";
 import Container from "@/components/Container";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 interface Props {
   params: { slug: string };
@@ -53,20 +55,24 @@ export default async function CategorySlugPage({
     })) ?? [];
 
   return (
-    <main className="py-16">
-      <Container>
-        <h1 className="text-3xl text-gray-900 mb-6 capitalize">
-          {normalizedSlug}
-        </h1>
+    <>
+      <Header />
+      <main className="py-16">
+        <Container>
+          <h1 className="text-3xl text-gray-900 mb-6 capitalize">
+            {normalizedSlug}
+          </h1>
 
-        <GalleryGrid mockups={mockups} />
+          <GalleryGrid mockups={mockups} />
 
-        <PaginationControls
-          currentPage={page}
-          totalItems={count ?? 0}
-          itemsPerPage={itemsPerPage}
-        />
-      </Container>
-    </main>
+          <PaginationControls
+            currentPage={page}
+            totalItems={count ?? 0}
+            itemsPerPage={itemsPerPage}
+          />
+        </Container>
+      </main>
+      <Footer />
+    </>
   );
 }

@@ -1,6 +1,8 @@
 // app/search/page.tsx
 import Container from "@/components/Container";
+import Footer from "@/components/Footer";
 import GalleryGrid from "@/components/GalleryGrid";
+import Header from "@/components/Header";
 import PaginationControls from "@/components/PaginationControls";
 import { algoliaResponse } from "@/lib/algoliaSearch";
 
@@ -50,33 +52,37 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   }
 
   return (
-    <div className="py-8">
-      <section className="py-5">
-        <Container>
-          <h1 className="text-3xl mb-10 text-center">
-            Search Results: <span className="text-primary">{query}</span>
-          </h1>
+    <>
+      <Header />
+      <div className="py-8">
+        <section className="py-5">
+          <Container>
+            <h1 className="text-3xl mb-10 text-center">
+              Search Results: <span className="text-primary">{query}</span>
+            </h1>
 
-          {loading && <p className="text-center">Loading...</p>}
+            {loading && <p className="text-center">Loading...</p>}
 
-          {!loading && results.length === 0 && query && (
-            <p className="text-center">No results found for "{query}".</p>
-          )}
+            {!loading && results.length === 0 && query && (
+              <p className="text-center">No results found for "{query}".</p>
+            )}
 
-          {!loading && results.length > 0 && (
-            <>
-              <GalleryGrid mockups={results} />
-              <PaginationControls
-                currentPage={pageParam}
-                totalItems={totalHits}
-                itemsPerPage={itemsPerPage}
-                query={query}
-              />
-            </>
-          )}
-        </Container>
-      </section>
-    </div>
+            {!loading && results.length > 0 && (
+              <>
+                <GalleryGrid mockups={results} />
+                <PaginationControls
+                  currentPage={pageParam}
+                  totalItems={totalHits}
+                  itemsPerPage={itemsPerPage}
+                  query={query}
+                />
+              </>
+            )}
+          </Container>
+        </section>
+      </div>
+      <Footer />
+    </>
   );
 }
 

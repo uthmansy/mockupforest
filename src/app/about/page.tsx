@@ -1,4 +1,6 @@
 import Container from "@/components/Container";
+import Footer from "@/components/Footer";
+import Header from "@/components/Header";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -10,6 +12,7 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <>
+      <Header />
       <Container>
         <main className="max-w-3xl mx-auto py-16 prose prose-neutral">
           <h1>About Me</h1>
@@ -38,6 +41,7 @@ export default function AboutPage() {
           </p>
         </main>
       </Container>
+      <Footer />
     </>
   );
 }

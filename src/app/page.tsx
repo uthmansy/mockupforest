@@ -3,6 +3,8 @@ import { Metadata } from "next";
 import MockupGallery from "@/components/MockupGallery";
 import CategoriesList from "@/components/CategoriesList";
 import HeroSearch from "@/components/HeroSearch";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
   title: "Free PSD Mockups",
@@ -17,6 +19,7 @@ export default function Home({
 }) {
   return (
     <>
+      <Header />
       <section className="mb-10">
         <HeroSearch />
       </section>
@@ -32,6 +35,7 @@ export default function Home({
           <MockupGallery searchParams={searchParams} />
         </Container>
       </section>
+      <Footer />
     </>
   );
 }

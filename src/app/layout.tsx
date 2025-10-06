@@ -50,9 +50,7 @@ export default function RootLayout({
         </Script>
       </head>
       <body className="antialiased font-light">
-        <Header />
         <main>{children}</main>
-        <Footer />
       </body>
     </html>
   );
