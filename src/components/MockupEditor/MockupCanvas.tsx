@@ -10,6 +10,8 @@ import BaseLayer from "./BaseLayer";
 import Download from "./Download";
 import { useLayersStore } from "@/app/stores/useLayersStore";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { BlendLayer } from "./BlendLayer";
+import { ColorLayer } from "./ColorLayer";
 
 export interface MockupCanvasProps extends MockupSceneProps {
   canvasWidth?: number;
@@ -17,8 +19,8 @@ export interface MockupCanvasProps extends MockupSceneProps {
 }
 
 export const MockupCanvas: React.FC<MockupCanvasProps> = ({
-  canvasWidth = 4000,
-  canvasHeight = 3000,
+  canvasWidth = 2000,
+  canvasHeight = 1500,
 }) => {
   const glRef = useRef<THREE.WebGLRenderer>(null);
 
@@ -26,7 +28,7 @@ export const MockupCanvas: React.FC<MockupCanvasProps> = ({
   const loading = useLayersStore((state) => state.loading);
 
   return (
-    <div className="relative w-full h-screen flex items-center justify-center overflow-hidden">
+    <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
       {loading && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-xs text-white z-50">
           <AiOutlineLoading3Quarters className="animate-spin text-5xl mb-4" />
@@ -43,7 +45,13 @@ export const MockupCanvas: React.FC<MockupCanvasProps> = ({
         <Canvas
           style={{ width: "100%", height: "100%" }}
           dpr={1}
-          gl={{ preserveDrawingBuffer: true, antialias: true }}
+          gl={{
+            outputColorSpace: THREE.SRGBColorSpace,
+            toneMapping: THREE.ACESFilmicToneMapping,
+            toneMappingExposure: 1.0,
+            preserveDrawingBuffer: true,
+            antialias: true,
+          }}
           onCreated={({ gl }) => {
             glRef.current = gl;
             gl.setSize(canvasWidth, canvasHeight, false);
@@ -66,17 +74,31 @@ export const MockupCanvas: React.FC<MockupCanvasProps> = ({
             src="/editor/beauty.jpg"
           />
 
-          {layers.map((layer) => (
-            <DesignLayer
-              key={layer.id}
-              height={layer.height}
-              width={layer.width}
-              design={layer.design}
-              uvPass={layer.uvPass}
-              mask={layer.mask}
-              zIndex={layer.zIndex}
-            />
-          ))}
+          {layers.map((layer) => {
+            return layer.type === "design" ? (
+              <DesignLayer
+                key={layer.id}
+                height={layer.height}
+                width={layer.width}
+                design={layer.design || null}
+                uvPass={layer.uvPass}
+                mask={layer.mask}
+                zIndex={layer.zIndex}
+                croppedArea={layer.croppedArea}
+              />
+            ) : (
+              <ColorLayer
+                key={layer.id}
+                height={layer.height}
+                width={layer.width}
+                mask={layer.mask}
+                zIndex={layer.zIndex}
+                color={layer.color}
+                base="/editor/blend.jpg"
+              />
+            );
+          })}
+          {/* <BlendLayer height={canvasHeight} width={canvasWidth} /> */}
         </Canvas>
       </div>
     </div>

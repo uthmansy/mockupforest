@@ -114,3 +114,26 @@ ol {
 .site-footer a {
   @apply text-inherit hover:text-white;
 }
+
+.scrollbar-dark::-webkit-scrollbar {
+  width: 6px; /* slim */
+}
+
+.scrollbar-dark::-webkit-scrollbar-track {
+  background: #111; /* track color */
+}
+
+.scrollbar-dark::-webkit-scrollbar-thumb {
+  background-color: #555; /* draggable part */
+  border-radius: 3px;
+}
+
+.scrollbar-dark::-webkit-scrollbar-thumb:hover {
+  background-color: #888; /* hover color */
+}
+
+/* Firefox */
+.scrollbar-dark {
+  scrollbar-width: thin;
+  scrollbar-color: #555 #111;
+}

@@ -1,4 +1,5 @@
 // stores/useLayersStore.ts
+import { Area } from "react-easy-crop";
 import { create } from "zustand";
 
 interface Group {
@@ -10,11 +11,17 @@ interface Layer {
   id: number;
   height: number;
   width: number;
-  design: string | null;
-  uvPass: string;
+  design?: string | null;
+  uvPass?: string;
   mask: string;
   zIndex: number;
   groupId?: number | null;
+  crop: { x: number; y: number };
+  croppedAreaPixels?: Area | null;
+  croppedArea?: Area | null;
+  zoom?: number;
+  type: "design" | "color";
+  color?: string;
 }
 
 interface LayersState {
@@ -47,19 +54,24 @@ export const useLayersStore = create<LayersState>((set) => ({
       height: 1500,
       width: 2000,
       mask: "/editor/mask.jpg",
-      uvPass: "/editor/uvpass.exr",
+      uvPass: "/editor/u.exr",
       zIndex: 1,
       groupId: null,
+      crop: { x: 0, y: 0 },
+      zoom: 1,
+      type: "design",
     },
     {
       id: 2,
-      design: "/editor/design-layout.jpg",
       height: 1500,
       width: 2000,
       mask: "/editor/mask.jpg",
-      uvPass: "/editor/uvpass.exr",
       zIndex: 2,
       groupId: null,
+      crop: { x: 0, y: 0 },
+      zoom: 1,
+      type: "color",
+      color: "#0000ff",
     },
   ],
   groups: [{ id: 1, name: "Default Group" }],
