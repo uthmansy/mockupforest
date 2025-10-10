@@ -25,8 +25,8 @@ export const ColorLayer: React.FC<ColorLayerProps> = ({
   height,
   zIndex,
   shadowIntensity = 0, // Much gentler shadows by default
-  highlightIntensity = 1.5, // Brighter highlights by default
-  noiseAmount = 0.05,
+  highlightIntensity = 3, // Brighter highlights by default
+  noiseAmount = 0.03,
 }) => {
   const { gl } = useThree();
   const setLoading = useLayersStore((s) => s.setLoading);

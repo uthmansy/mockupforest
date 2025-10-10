@@ -94,7 +94,7 @@ export const MockupCanvas: React.FC<MockupCanvasProps> = ({
                 mask={layer.mask}
                 zIndex={layer.zIndex}
                 color={layer.color}
-                base="/editor/blend.jpg"
+                base="/editor/beauty.jpg"
               />
             );
           })}
