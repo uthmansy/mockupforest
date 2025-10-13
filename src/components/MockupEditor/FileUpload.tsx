@@ -3,6 +3,7 @@
 import { useLayersStore } from "@/app/stores/useLayersStore";
 import { useState } from "react";
 import Cropper from "react-easy-crop";
+import { SlLayers } from "react-icons/sl";
 
 interface FileUploadProps {
   label: string;
@@ -47,45 +48,52 @@ export default function FileUpload({
       reader.readAsDataURL(file);
     };
 
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
   //@ts-ignore
   const onCropComplete = (croppedArea, croppedAreaPixels) => {
     // console.log(croppedArea, croppedAreaPixels);
   };
 
   return (
-    <div className="mb-4">
+    <div className="md:mb-4 p-6 md:p-0">
       {/* <label className="block text-sm font-medium mb-2">{label}</label> */}
+      <div className="my-5">
+        <h5 className="uppercase text-sm flex items-center space-x-2">
+          <SlLayers className="text-lg" />
+          <span className="flex-1 truncate">{layer.name}</span>
+        </h5>
+        <Cropper
+          classes={{ containerClassName: "bg-white" }}
+          style={{
+            containerStyle: {
+              borderRadius: "5px",
+              height: 120,
+              width: "100%",
+              position: "relative",
+            },
+          }}
+          image={layer.design || undefined}
+          crop={layer.crop}
+          zoom={layer.zoom}
+          aspect={4 / 3}
+          onCropChange={(crop) => {
+            updateLayer(layerId, { crop });
+          }}
+          onCropAreaChange={(croppedAreaPixels, croppedArea) => {
+            updateLayer(layerId, { croppedAreaPixels, croppedArea });
+          }}
+          onZoomChange={(zoom) => {
+            updateLayer(layerId, { zoom });
+          }}
+        />
+      </div>
       <input
         type="file"
         accept={accept}
         onChange={createFileHandler((result) => {
           updateLayer(layerId, { design: result.src });
         })}
-        className="w-full p-4 bg-neutral-800 hover:bg-neutral-700 transition-all duration-75 cursor-pointer rounded-md text-sm text-white/50"
+        className="w-full p-4 bg-neutral-600 hover:bg-neutral-700 transition-all duration-75 cursor-pointer rounded-md text-sm text-white/50 relative"
       />
-      <div className="relative aspect-4/3 my-5">
-        <div className="absolute top-0 left-0 right-0 bottom-0">
-          <Cropper
-            image={layer.design || undefined}
-            crop={layer.crop}
-            zoom={layer.zoom}
-            aspect={4 / 3}
-            onCropChange={(crop) => {
-              setCrop(crop);
-              updateLayer(layerId, { crop });
-            }}
-            onCropAreaChange={(croppedAreaPixels, croppedArea) => {
-              updateLayer(layerId, { croppedAreaPixels, croppedArea });
-            }}
-            onZoomChange={(zoom) => {
-              setZoom(zoom);
-              updateLayer(layerId, { zoom });
-            }}
-          />
-        </div>
-      </div>
     </div>
   );
 }

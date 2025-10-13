@@ -29,7 +29,7 @@ function Download({ glRef }: Props) {
     <button
       onClick={handleDownload}
       disabled={isExporting}
-      className="w-14 h-14 flex items-center justify-center bg-white rounded-full absolute top-5 right-5 z-10"
+      className="w-14 h-14 flex items-center justify-center bg-white"
       style={{
         cursor: isExporting ? "not-allowed" : "pointer",
       }}

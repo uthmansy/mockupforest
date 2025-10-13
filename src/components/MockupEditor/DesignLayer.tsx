@@ -1,35 +1,41 @@
 "use client";
 
 import React, { useEffect, useState, useMemo, useRef } from "react";
-import { useThree } from "@react-three/fiber";
+import { useThree, useFrame } from "@react-three/fiber"; // ← added useFrame
 import * as THREE from "three";
 import { EXRLoader } from "three/examples/jsm/loaders/EXRLoader.js";
 import { useLayersStore } from "@/app/stores/useLayersStore";
 import { Area } from "react-easy-crop";
 
 interface DesignLayerProps {
-  uvPass?: string;
   mask: string;
   design: string | null;
   width: number;
   height: number;
   zIndex: number;
   croppedArea?: Area | null;
+  shadowIntensity?: number;
+  highlightIntensity?: number;
+  noiseAmount?: number;
 }
 
 export const DesignLayer: React.FC<DesignLayerProps> = ({
-  uvPass,
   mask,
   design,
   width,
   height,
   zIndex,
   croppedArea,
+  shadowIntensity = 0,
+  highlightIntensity = 2.7,
+  noiseAmount = 0.01,
 }) => {
   const { gl } = useThree();
   const setLoading = useLayersStore((s) => s.setLoading);
 
-  const [uvTexture, setUvTexture] = useState<THREE.Texture | null>(null);
+  const { global } = useLayersStore();
+  const uvTexture = global.uvTexture;
+  const baseTexture = global.baseTexture;
   const [designTexture, setDesignTexture] = useState<THREE.Texture | null>(
     null
   );
@@ -39,22 +45,42 @@ export const DesignLayer: React.FC<DesignLayerProps> = ({
     height: 1,
   });
 
-  // Track loading state internally to prevent race conditions
   const isLoadingRef = useRef(false);
+  const materialRef = useRef<THREE.ShaderMaterial>(null);
+
+  // Uniform refs for reactive updates
+  const shadowIntensityRef = useRef(shadowIntensity);
+  const highlightIntensityRef = useRef(highlightIntensity);
+  const noiseAmountRef = useRef(noiseAmount);
+
+  // Update refs when props change
+  useEffect(() => {
+    shadowIntensityRef.current = shadowIntensity;
+    highlightIntensityRef.current = highlightIntensity;
+    noiseAmountRef.current = noiseAmount;
+  }, [shadowIntensity, highlightIntensity, noiseAmount]);
+
+  // Sync uniforms every frame (like ColorLayer)
+  useFrame(() => {
+    if (materialRef.current) {
+      materialRef.current.uniforms.shadowIntensity.value =
+        shadowIntensityRef.current;
+      materialRef.current.uniforms.highlightIntensity.value =
+        highlightIntensityRef.current;
+      materialRef.current.uniforms.noiseAmount.value = noiseAmountRef.current;
+    }
+  });
 
   // Load textures
   useEffect(() => {
-    if (!design) {
-      // Immediate cleanup when design becomes null
-      if (uvTexture) uvTexture.dispose();
-      if (designTexture) designTexture.dispose();
-      if (maskTexture) maskTexture.dispose();
-
-      setUvTexture(null);
+    if (!design || !uvTexture) {
+      // Cleanup
+      [uvTexture, designTexture, maskTexture, baseTexture].forEach((tex) =>
+        tex?.dispose()
+      );
       setDesignTexture(null);
       setMaskTexture(null);
       setDesignDimensions({ width: 1, height: 1 });
-
       if (isLoadingRef.current) {
         setLoading(false);
         isLoadingRef.current = false;
@@ -74,10 +100,7 @@ export const DesignLayer: React.FC<DesignLayerProps> = ({
         exrLoader.load(
           url,
           (texture) => {
-            if (canceled) {
-              texture.dispose();
-              return;
-            }
+            if (canceled) return texture.dispose();
             texture.wrapS = texture.wrapT = THREE.ClampToEdgeWrapping;
             texture.minFilter = THREE.LinearFilter;
             texture.magFilter = THREE.LinearFilter;
@@ -90,10 +113,7 @@ export const DesignLayer: React.FC<DesignLayerProps> = ({
             resolve(texture);
           },
           undefined,
-          (error) => {
-            console.error("Failed to load UV texture:", error);
-            reject(error);
-          }
+          reject
         );
       });
 
@@ -102,13 +122,9 @@ export const DesignLayer: React.FC<DesignLayerProps> = ({
         textureLoader.load(
           url,
           (texture) => {
-            if (canceled) {
-              texture.dispose();
-              return;
-            }
+            if (canceled) return texture.dispose();
             const img = texture.image as HTMLImageElement;
-            if (img) {
-              console.log("img from loader:", img.naturalHeight);
+            if (img && url === design) {
               setDesignDimensions({
                 width: img.naturalWidth,
                 height: img.naturalHeight,
@@ -128,17 +144,13 @@ export const DesignLayer: React.FC<DesignLayerProps> = ({
             resolve(texture);
           },
           undefined,
-          (error) => {
-            console.error("Failed to load texture:", url, error);
-            reject(error);
-          }
+          reject
         );
       });
-    if (!uvPass) return;
-    Promise.all([loadUvTexture(uvPass), loadTexture(design), loadTexture(mask)])
-      .then(([uv, designTex, maskTex]) => {
+
+    Promise.all([loadTexture(design), loadTexture(mask)])
+      .then(([designTex, maskTex]) => {
         if (!canceled) {
-          setUvTexture(uv);
           setDesignTexture(designTex);
           setMaskTexture(maskTex);
           setLoading(false);
@@ -155,17 +167,21 @@ export const DesignLayer: React.FC<DesignLayerProps> = ({
 
     return () => {
       canceled = true;
-      // Only set loading to false if we were actually loading
       if (isLoadingRef.current) {
         setLoading(false);
         isLoadingRef.current = false;
       }
     };
-  }, [uvPass, design, mask, gl, setLoading]);
+  }, [uvTexture, design, mask, global.base, gl, setLoading]);
 
-  // Compute uniforms declaratively
   const uniforms = useMemo(() => {
-    if (!uvTexture || !designTexture || !maskTexture) return null;
+    if (
+      !global.uvTexture ||
+      !global.baseTexture ||
+      !designTexture ||
+      !maskTexture
+    )
+      return null;
 
     const uvMin = new THREE.Vector2(
       (croppedArea?.x || 0) / designDimensions.width,
@@ -184,43 +200,45 @@ export const DesignLayer: React.FC<DesignLayerProps> = ({
       uvPassTexture: { value: uvTexture },
       designTexture: { value: designTexture },
       maskTexture: { value: maskTexture },
-      cropOffset: { value: uvMin }, // acts as uvMin
-      cropScale: { value: uvMax }, // acts as uvMax
+      baseTexture: { value: baseTexture }, // ← added
+      cropOffset: { value: uvMin },
+      cropScale: { value: uvMax },
+      shadowIntensity: { value: shadowIntensity },
+      highlightIntensity: { value: highlightIntensity },
+      noiseAmount: { value: noiseAmount },
     };
   }, [
     uvTexture,
     designTexture,
     maskTexture,
+    baseTexture,
     croppedArea,
-    width,
-    height,
     designDimensions,
+    shadowIntensity,
+    highlightIntensity,
+    noiseAmount,
   ]);
 
-  // Debug: log when textures are loaded
-  useEffect(() => {
-    if (uvTexture && designTexture && maskTexture) {
-    }
-  }, [uvTexture, designTexture, maskTexture, design, croppedArea]);
-
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (uvTexture) uvTexture.dispose();
-      if (designTexture) designTexture.dispose();
-      if (maskTexture) maskTexture.dispose();
+      [uvTexture, designTexture, maskTexture, baseTexture].forEach((tex) =>
+        tex?.dispose()
+      );
     };
-  }, [uvTexture, designTexture, maskTexture]);
+  }, [uvTexture, designTexture, maskTexture, baseTexture]);
 
-  if (!uniforms) {
-    return null;
-  }
+  if (!uniforms) return null;
 
   return (
     <mesh position={[0, 0, zIndex]}>
       <planeGeometry args={[width, height]} />
       <shaderMaterial
+        ref={materialRef}
         key={`${designTexture?.uuid}-${croppedArea?.x}-${croppedArea?.y}`}
+        transparent
+        depthTest
+        depthWrite={false}
+        uniforms={uniforms}
         vertexShader={`
           varying vec2 vUv;
           void main() {
@@ -230,46 +248,66 @@ export const DesignLayer: React.FC<DesignLayerProps> = ({
         `}
         fragmentShader={`
           precision highp float;
+
           uniform sampler2D uvPassTexture;
           uniform sampler2D designTexture;
           uniform sampler2D maskTexture;
+          uniform sampler2D baseTexture; // ← lighting info
           uniform vec2 cropOffset;
           uniform vec2 cropScale;
+          uniform float shadowIntensity;
+          uniform float highlightIntensity;
+          uniform float noiseAmount;
+
           varying vec2 vUv;
 
+          // Simple hash-based noise
+          float random(vec2 st) {
+            return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+          }
+
           void main() {
+            // Remap UV using UV pass
             vec2 mappedUV = texture2D(uvPassTexture, vUv).rg;
             mappedUV = clamp(mappedUV, 0.0, 1.0);
-
-            // Define your design UV range
-            vec2 uvMin = cropOffset;
-            vec2 uvMax = cropScale;
-
-            // Remap UVs into the defined subrange
-            vec2 designUV = uvMin + mappedUV * (uvMax - uvMin);
-
-            // Sample the design within this range
+            vec2 designUV = cropOffset + mappedUV * (cropScale - cropOffset);
             vec4 designColor = texture2D(designTexture, designUV);
+            if (designColor.a < 0.01) discard;
 
-            // Sample the mask normally
-            vec4 maskColor = texture2D(maskTexture, vUv);
+            // Base lighting (from neutral gray render)
+            vec3 baseCol = texture2D(baseTexture, vUv).rgb;
+            float brightness = dot(baseCol, vec3(0.3333));
 
-            // Apply threshold to mask to ensure white areas are opaque and dark areas are transparent
-            float maskValue = maskColor.r;
-            float threshold = 0.1; // Adjust this value based on your mask
-            float alpha = step(threshold, maskValue);
+            // Normalize: shadows 0–0.2, highlights 0.2–1
+            float normalized = brightness < 0.5
+                ? brightness * 0.4
+                : 0.2 + (brightness - 0.5) * 1.6;
 
-            // Alternative: Use smoothstep for smoother edges if needed
-            // float alpha = smoothstep(0.1, 0.3, maskValue);
+            // Add noise
+            float noise = random(vUv * 1024.0) * 2.0 - 1.0;
+            normalized = clamp(normalized + noise * noiseAmount, 0.0, 1.0);
 
-            // Apply mask with threshold
-            gl_FragColor = vec4(designColor.rgb, designColor.a * alpha);
+            // Lighting factors
+            float shadowFactor = mix(0.7, 1.0, normalized);
+            float highlightFactor = smoothstep(0.2, 1.0, normalized) * highlightIntensity;
+
+            // Apply lighting to design color (not flat color)
+            vec3 designRGB = designColor.rgb;
+            float colorBrightness = dot(designRGB, vec3(0.3333));
+            vec3 shadowed = designRGB * shadowFactor;
+            float highlightBoost = (1.0 - colorBrightness) * 0.5;
+            vec3 highlighted = designRGB + baseCol * highlightFactor * (1.0 + highlightBoost);
+
+            vec3 finalCol = mix(shadowed, highlighted, normalized);
+            finalCol = max(finalCol, designRGB * 0.3); // brightness floor
+
+            // Smooth mask alpha
+            float maskValue = texture2D(maskTexture, vUv).r;
+            float alpha = smoothstep(0.1, 0.3, maskValue) * designColor.a;
+
+            gl_FragColor = vec4(finalCol, alpha);
           }
         `}
-        uniforms={uniforms}
-        transparent
-        depthTest
-        depthWrite={false}
       />
     </mesh>
   );
