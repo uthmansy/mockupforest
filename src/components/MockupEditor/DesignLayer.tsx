@@ -3,7 +3,6 @@
 import React, { useEffect, useState, useMemo, useRef } from "react";
 import { useThree, useFrame } from "@react-three/fiber"; // ← added useFrame
 import * as THREE from "three";
-import { EXRLoader } from "three/examples/jsm/loaders/EXRLoader.js";
 import { useLayersStore } from "@/app/stores/useLayersStore";
 import { Area } from "react-easy-crop";
 import { useGlobalSettingsStore } from "@/app/stores/useGlobalSettingsStore";

@@ -7,7 +7,6 @@ import { Dispatch, RefObject, SetStateAction, useEffect, useRef } from "react";
 import { MockupSceneProps } from "@/components/MockupEditor/types";
 import { DesignLayer } from "./DesignLayer";
 import BaseLayer from "./BaseLayer";
-import Download from "./Download";
 import { useLayersStore } from "@/app/stores/useLayersStore";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { ColorLayer } from "./ColorLayer";
@@ -29,12 +28,7 @@ export const MockupCanvas: React.FC<MockupCanvasProps> = ({
 }) => {
   const glRef = useRef<THREE.WebGLRenderer>(null);
   useEffect(() => setGlRef(glRef), [glRef]);
-  const {
-    // updateGlobal,
-    layers,
-    loading,
-    setLoading,
-  } = useLayersStore();
+  const { layers, loading, setLoading } = useLayersStore();
   const globalSettings = useGlobalSettingsStore();
 
   useEffect(() => {

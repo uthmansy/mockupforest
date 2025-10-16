@@ -1,19 +1,13 @@
 "use client";
 
 import Sidebar from "./Sidebar";
-import dynamic from "next/dynamic";
 import { MockupCanvas } from "./MockupCanvas";
 import MobileBar from "./MobileBar";
 import { useState, useEffect, RefObject } from "react";
 import * as THREE from "three";
 import Download from "./Download";
 import { Mockup } from "@/types/db";
-import {
-  Group,
-  Layer,
-  LayersState,
-  useLayersStore,
-} from "@/app/stores/useLayersStore";
+import { Group, Layer, useLayersStore } from "@/app/stores/useLayersStore";
 import { useSidebarStore } from "@/app/stores/useSidebarStore";
 import { useGlobalSettingsStore } from "@/app/stores/useGlobalSettingsStore";
 
