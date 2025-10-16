@@ -9,13 +9,12 @@ import { MdImage } from "react-icons/md";
 
 function MobileBar() {
   const layers = useSidebarStore((state) => state.sidebarLayers);
-  const [currentLayerId, setCurrentLayerId] = useState<number>(1);
+  const [currentLayerId, setCurrentLayerId] = useState<number>(2);
   const [currentLayer, setCurrentLayer] = useState<SidebarLayer | null>(null);
   const [showPanel, setShowPanel] = useState<boolean>(false);
 
   useEffect(() => {
     setCurrentLayer(layers.filter((l) => l.id === currentLayerId)[0]);
-    console.log("parent rendered");
   }, [currentLayerId, layers]);
 
   return (

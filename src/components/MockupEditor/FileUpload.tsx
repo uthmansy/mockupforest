@@ -1,8 +1,8 @@
 "use client";
 
+import React, { useEffect, useRef, useState } from "react";
 import { useLayersStore } from "@/app/stores/useLayersStore";
-import { useState } from "react";
-import Cropper from "react-easy-crop";
+import Cropper, { Area } from "react-easy-crop";
 import { SlLayers } from "react-icons/sl";
 
 interface FileUploadProps {
@@ -12,14 +12,33 @@ interface FileUploadProps {
 }
 
 export default function FileUpload({
-  label,
-  accept = "image/*",
   layerId,
-}: FileUploadProps) {
+  accept,
+}: // label,
+FileUploadProps) {
   const { updateLayer } = useLayersStore();
-  const layer = useLayersStore(
-    (s) => s.layers.filter((l) => l.id === layerId)[0]
+
+  // Single selector to read the whole layer object (stable)
+  const layer = useLayersStore((state) =>
+    state.layers.find((l) => l.id === layerId)
   );
+
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const croppedAreaPixelsRef = useRef<Area | null | undefined>(null);
+  //@ts-ignore
+  const handleCropChange = (croppedArea, croppedAreaPixels) => {
+    if (
+      JSON.stringify(croppedAreaPixelsRef.current) ===
+      JSON.stringify(croppedAreaPixels)
+    )
+      return;
+    console.log("updating.........");
+    updateLayer(layerId, { croppedAreaPixels, croppedArea });
+    croppedAreaPixelsRef.current = croppedAreaPixels;
+  };
+
+  // File input handler
   const createFileHandler =
     (
       onResult: (result: {
@@ -48,19 +67,14 @@ export default function FileUpload({
       reader.readAsDataURL(file);
     };
 
-  //@ts-ignore
-  const onCropComplete = (croppedArea, croppedAreaPixels) => {
-    // console.log(croppedArea, croppedAreaPixels);
-  };
-
   return (
     <div className="md:mb-4 p-6 md:p-0">
-      {/* <label className="block text-sm font-medium mb-2">{label}</label> */}
       <div className="my-5">
         <h5 className="uppercase text-sm flex items-center space-x-2">
           <SlLayers className="text-lg" />
-          <span className="flex-1 truncate">{layer.name}</span>
+          <span className="flex-1 truncate">{layer?.name}</span>
         </h5>
+
         <Cropper
           classes={{ containerClassName: "bg-white" }}
           style={{
@@ -71,21 +85,16 @@ export default function FileUpload({
               position: "relative",
             },
           }}
-          image={layer.design || undefined}
-          crop={layer.crop}
-          zoom={layer.zoom}
-          aspect={4 / 3}
-          onCropChange={(crop) => {
-            updateLayer(layerId, { crop });
-          }}
-          onCropAreaChange={(croppedAreaPixels, croppedArea) => {
-            updateLayer(layerId, { croppedAreaPixels, croppedArea });
-          }}
-          onZoomChange={(zoom) => {
-            updateLayer(layerId, { zoom });
-          }}
+          image={layer?.design || undefined}
+          crop={crop}
+          zoom={zoom}
+          aspect={layer?.aspectRatio}
+          onCropChange={setCrop}
+          onCropAreaChange={handleCropChange}
+          onZoomChange={setZoom}
         />
       </div>
+
       <input
         type="file"
         accept={accept}

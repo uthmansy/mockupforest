@@ -8,8 +8,6 @@ import { useSidebarStore } from "@/app/stores/useSidebarStore";
 
 export default function Sidebar() {
   const layers = useSidebarStore((state) => state.sidebarLayers);
-  const handleClearAll = () => {};
-  console.log("sidebar rendered");
 
   return (
     <aside className="w-full  text-white">
@@ -28,15 +26,6 @@ export default function Sidebar() {
               );
             })}
           </div>
-
-          {/* <div className="mt-6 space-y-3">
-            <button
-              onClick={handleClearAll}
-              className="w-full p-4 bg-secondary uppercase tracking-wider rounded-md hover:bg-secondary-bg hover:text-black cursor-pointer transition-all duration-75 text-sm"
-            >
-              Clear Design
-            </button>
-          </div> */}
         </div>
       </div>
     </aside>

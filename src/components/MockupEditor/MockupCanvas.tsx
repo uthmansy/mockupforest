@@ -12,6 +12,7 @@ import { useLayersStore } from "@/app/stores/useLayersStore";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { ColorLayer } from "./ColorLayer";
 import { EXRLoader } from "three/examples/jsm/Addons.js";
+import { useGlobalSettingsStore } from "@/app/stores/useGlobalSettingsStore";
 
 export interface MockupCanvasProps extends MockupSceneProps {
   canvasWidth?: number;
@@ -29,46 +30,53 @@ export const MockupCanvas: React.FC<MockupCanvasProps> = ({
   const glRef = useRef<THREE.WebGLRenderer>(null);
   useEffect(() => setGlRef(glRef), [glRef]);
   const {
-    global,
     // updateGlobal,
     layers,
     loading,
     setLoading,
-    setUvTexture,
-    setBaseTexture,
   } = useLayersStore();
+  const globalSettings = useGlobalSettingsStore();
 
   useEffect(() => {
+    // Run only after the renderer exists
+    const hasRenderer = !!glRef.current;
+    const hasTexturesToLoad = !!globalSettings.uv || !!globalSettings.base;
+
+    if (!hasRenderer || !hasTexturesToLoad) return;
+
     const exrLoader = new EXRLoader();
     const textureLoader = new THREE.TextureLoader();
 
-    // Start loading
     setLoading(true);
 
     let uvDone = false;
     let baseDone = false;
+    let isMounted = true;
 
     const checkDone = () => {
-      if (uvDone && baseDone) setLoading(false);
+      if (uvDone && baseDone && isMounted) {
+        setLoading(false);
+      }
     };
 
-    // Load UV
-    if (!global.uvTexture && global.uv) {
+    // --- Load UV texture ---
+    if (!globalSettings.uvTexture && globalSettings.uv) {
       exrLoader.load(
-        global.uv,
+        globalSettings.uv,
         (tex) => {
+          if (!isMounted) return;
           tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
           tex.colorSpace = THREE.NoColorSpace;
           tex.minFilter = THREE.LinearFilter;
           tex.magFilter = THREE.LinearFilter;
-          setUvTexture(tex);
+          globalSettings.setUvTexture(tex);
           uvDone = true;
           checkDone();
         },
         undefined,
         () => {
           console.error("Failed to load UV EXR");
-          uvDone = true; // mark as done anyway
+          uvDone = true;
           checkDone();
         }
       );
@@ -76,16 +84,17 @@ export const MockupCanvas: React.FC<MockupCanvasProps> = ({
       uvDone = true;
     }
 
-    // Load base
-    if (!global.baseTexture && global.base) {
+    // --- Load base texture ---
+    if (!globalSettings.baseTexture && globalSettings.base) {
       textureLoader.load(
-        global.base,
+        globalSettings.base,
         (tex) => {
+          if (!isMounted) return;
           tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
           tex.colorSpace = THREE.SRGBColorSpace;
           tex.minFilter = THREE.LinearMipmapLinearFilter;
           tex.magFilter = THREE.LinearFilter;
-          setBaseTexture(tex);
+          globalSettings.setBaseTexture(tex);
           baseDone = true;
           checkDone();
         },
@@ -101,7 +110,15 @@ export const MockupCanvas: React.FC<MockupCanvasProps> = ({
     }
 
     checkDone();
-  }, [global.uv, global.base]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [
+    glRef.current, // 👈 triggers when renderer becomes available
+    globalSettings.uv,
+    globalSettings.base,
+  ]);
 
   return (
     <div className="relative w-full h-full flex items-start md:items-center justify-center overflow-hidden p-6">
@@ -147,7 +164,7 @@ export const MockupCanvas: React.FC<MockupCanvasProps> = ({
           <BaseLayer
             height={canvasHeight}
             width={canvasWidth}
-            src={global.base}
+            src={globalSettings.base}
           />
 
           {layers.map((layer) => {
@@ -159,7 +176,8 @@ export const MockupCanvas: React.FC<MockupCanvasProps> = ({
                 design={layer.design || null}
                 mask={layer.mask}
                 zIndex={layer.zIndex}
-                croppedArea={layer.croppedArea}
+                croppedArea={layer.croppedAreaPixels}
+                noiseAmount={layer.noiseThreshold}
               />
             ) : (
               <ColorLayer
@@ -169,6 +187,7 @@ export const MockupCanvas: React.FC<MockupCanvasProps> = ({
                 mask={layer.mask}
                 zIndex={layer.zIndex}
                 color={layer.color}
+                noiseAmount={layer.noiseThreshold}
               />
             );
           })}

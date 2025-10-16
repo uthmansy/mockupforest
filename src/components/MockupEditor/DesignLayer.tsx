@@ -6,6 +6,7 @@ import * as THREE from "three";
 import { EXRLoader } from "three/examples/jsm/loaders/EXRLoader.js";
 import { useLayersStore } from "@/app/stores/useLayersStore";
 import { Area } from "react-easy-crop";
+import { useGlobalSettingsStore } from "@/app/stores/useGlobalSettingsStore";
 
 interface DesignLayerProps {
   mask: string;
@@ -28,12 +29,12 @@ export const DesignLayer: React.FC<DesignLayerProps> = ({
   croppedArea,
   shadowIntensity = 0,
   highlightIntensity = 2.7,
-  noiseAmount = 0.01,
+  noiseAmount = 0,
 }) => {
   const { gl } = useThree();
   const setLoading = useLayersStore((s) => s.setLoading);
 
-  const { global } = useLayersStore();
+  const global = useGlobalSettingsStore();
   const uvTexture = global.uvTexture;
   const baseTexture = global.baseTexture;
   const [designTexture, setDesignTexture] = useState<THREE.Texture | null>(
@@ -92,30 +93,7 @@ export const DesignLayer: React.FC<DesignLayerProps> = ({
     isLoadingRef.current = true;
     let canceled = false;
 
-    const exrLoader = new EXRLoader();
     const textureLoader = new THREE.TextureLoader();
-
-    const loadUvTexture = (url: string) =>
-      new Promise<THREE.Texture>((resolve, reject) => {
-        exrLoader.load(
-          url,
-          (texture) => {
-            if (canceled) return texture.dispose();
-            texture.wrapS = texture.wrapT = THREE.ClampToEdgeWrapping;
-            texture.minFilter = THREE.LinearFilter;
-            texture.magFilter = THREE.LinearFilter;
-            texture.generateMipmaps = false;
-            texture.colorSpace = THREE.NoColorSpace;
-            texture.anisotropy = Math.min(
-              16,
-              gl.capabilities.getMaxAnisotropy()
-            );
-            resolve(texture);
-          },
-          undefined,
-          reject
-        );
-      });
 
     const loadTexture = (url: string, srgb = true) =>
       new Promise<THREE.Texture>((resolve, reject) => {

@@ -64,7 +64,7 @@ function Picker({ layerId }: Props) {
         <div className="flex space-x-4" ref={pickerBoxRef}>
           <div
             style={{ background: inputValue }}
-            className="w-14 h-14 cursor-pointer rounded-lg"
+            className="w-14 h-14 cursor-pointer rounded-md"
             onClick={() => setShowPicker((prev) => !prev)}
           />
           <input

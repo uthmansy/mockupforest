@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useThree, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { useLayersStore } from "@/app/stores/useLayersStore";
+import { useGlobalSettingsStore } from "@/app/stores/useGlobalSettingsStore";
 
 interface ColorLayerProps {
   mask: string; // Mask texture URL
@@ -24,11 +25,11 @@ export const ColorLayer: React.FC<ColorLayerProps> = ({
   zIndex,
   shadowIntensity = 0,
   highlightIntensity = 2.5,
-  noiseAmount = 0.001,
+  noiseAmount = 0,
 }) => {
   const { gl } = useThree();
   const setLoading = useLayersStore((s) => s.setLoading);
-  const { global } = useLayersStore(); // 👈 access shared global textures
+  const global = useGlobalSettingsStore(); // 👈 access shared global textures
 
   const maskTex = useRef<THREE.Texture | null>(null);
   const materialRef = useRef<THREE.ShaderMaterial>(null);

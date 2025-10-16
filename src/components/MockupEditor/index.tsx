@@ -7,12 +7,29 @@ import MobileBar from "./MobileBar";
 import { useState, useEffect, RefObject } from "react";
 import * as THREE from "three";
 import Download from "./Download";
+import { Mockup } from "@/types/db";
+import {
+  Group,
+  Layer,
+  LayersState,
+  useLayersStore,
+} from "@/app/stores/useLayersStore";
+import { useSidebarStore } from "@/app/stores/useSidebarStore";
+import { useGlobalSettingsStore } from "@/app/stores/useGlobalSettingsStore";
 
-export default function MockupEditor() {
+interface Props {
+  mockupData?: Mockup;
+}
+
+export default function MockupEditor({ mockupData }: Props) {
   const [isMounted, setIsMounted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [isLargeScreen, setIsLargeScreen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [glRef, setGlRef] = useState<RefObject<THREE.WebGLRenderer | null>>();
+  const { setLayers, setGroups, layers } = useLayersStore();
+  const { syncWithLayers } = useSidebarStore();
+  const { updateGlobal, canvasHeight, canvasWidth } = useGlobalSettingsStore();
 
   useEffect(() => {
     setIsMounted(true);
@@ -28,8 +45,63 @@ export default function MockupEditor() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  useEffect(() => {
+    setIsLoading(true);
+    //@ts-ignore
+    const data: { layers: Layer[]; global: GlobalSettings; groups: Group[] } =
+      mockupData?.mockup_data;
+    setLayers(
+      data.layers.map((layer) => {
+        // 🔒 Ensure crop is always valid
+        const crop =
+          layer.crop && !isNaN(layer.crop.x) && !isNaN(layer.crop.y)
+            ? layer.crop
+            : { x: 0, y: 0 };
+
+        // 🔒 Ensure zoom is a valid number >= 0.1
+        const zoom =
+          layer.zoom && !isNaN(layer.zoom) && layer.zoom > 0 ? layer.zoom : 1;
+
+        // 🔒 Ensure aspectRatio is valid (not 0, NaN, or Infinity)
+        let aspectRatio = layer.aspectRatio;
+        if (
+          aspectRatio == null ||
+          isNaN(aspectRatio) ||
+          aspectRatio <= 0 ||
+          !isFinite(aspectRatio)
+        ) {
+          // Fallback: use width/height if available, else 1
+          aspectRatio =
+            layer.width && layer.height ? layer.width / layer.height : 1;
+        }
+
+        return {
+          ...layer,
+          mask: `https://mzjwyiqfusnwbzhtelvh.supabase.co/storage/v1/object/public/files/online-mockups/${data.global?.name}/${layer.mask}`,
+          design: layer.design
+            ? `https://mzjwyiqfusnwbzhtelvh.supabase.co/storage/v1/object/public/files/online-mockups/${data.global?.name}/${layer.design}`
+            : null,
+          width: layer.width * 0.5,
+          height: layer.height * 0.5,
+          // crop,
+          // zoom,
+          // aspectRatio,
+        };
+      })
+    );
+
+    setGroups(data.groups);
+    updateGlobal({
+      ...data.global,
+      uv: `https://mzjwyiqfusnwbzhtelvh.supabase.co/storage/v1/object/public/files/online-mockups/${data.global?.name}/${data.global?.uv}`,
+      base: `https://mzjwyiqfusnwbzhtelvh.supabase.co/storage/v1/object/public/files/online-mockups/${data.global?.name}/${data.global?.base}`,
+    });
+    syncWithLayers(data.layers);
+    setIsLoading(false);
+  }, [mockupData]);
+
   // Don't render anything until mounted on client
-  if (!isMounted) {
+  if (!isMounted || !mockupData || isLoading) {
     return (
       <div className="h-screen flex items-center justify-center bg-neutral-800">
         <div className="text-white">Loading...</div>
@@ -37,10 +109,18 @@ export default function MockupEditor() {
     );
   }
 
+  if (!mockupData) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-neutral-800">
+        <div className="text-white">Error Loading Assets</div>
+      </div>
+    );
+  }
+
   return (
     <div className="h-screen flex flex-col md:flex-row bg-black overflow-hidden">
       {isLargeScreen && (
-        <div className="w-72 min-w-80 h-full overflow-y-auto max-h-full bg-neutral-800 border-white/20 p-6 py-10 border-r-[0.5px] scrollbar-dark">
+        <div className="md:w-60 xl:w-72 h-full overflow-y-auto max-h-full bg-neutral-800 border-white/20 p-6 py-10 border-r-[0.5px] scrollbar-dark">
           <Sidebar />
         </div>
       )}
@@ -51,8 +131,8 @@ export default function MockupEditor() {
         </div>
         <MockupCanvas
           setGlRef={setGlRef}
-          canvasWidth={2000}
-          canvasHeight={1500}
+          canvasWidth={canvasWidth * 0.5 || 2000}
+          canvasHeight={canvasHeight * 0.5 || 1500}
         />
       </div>
 

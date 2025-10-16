@@ -1,4 +1,6 @@
 "use client";
+import { useGlobalSettingsStore } from "@/app/stores/useGlobalSettingsStore";
+import { useLayersStore } from "@/app/stores/useLayersStore";
 import React, { RefObject, useState } from "react";
 import { GrDownload } from "react-icons/gr";
 import * as THREE from "three";
@@ -9,6 +11,7 @@ interface Props {
 
 function Download({ glRef }: Props) {
   const [isExporting, setIsExporting] = useState(false);
+  const global = useGlobalSettingsStore();
 
   const handleDownload = () => {
     if (!glRef.current) return;
@@ -16,7 +19,7 @@ function Download({ glRef }: Props) {
     setTimeout(() => {
       try {
         const link = document.createElement("a");
-        link.download = "mockup.png";
+        link.download = `${global.name}.png`;
         link.href = glRef.current!.domElement.toDataURL("image/png");
         link.click();
       } finally {

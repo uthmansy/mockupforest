@@ -21,18 +21,7 @@ interface SidebarState {
 }
 
 export const useSidebarStore = create<SidebarState>((set) => ({
-  sidebarLayers: [
-    {
-      id: 1,
-      type: "design",
-      name: "Design",
-    },
-    {
-      id: 2,
-      type: "color",
-      name: "Color",
-    },
-  ],
+  sidebarLayers: [],
 
   setSidebarLayers: (layers) => set({ sidebarLayers: layers }),
 

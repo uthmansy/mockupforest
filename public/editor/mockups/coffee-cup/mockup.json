@@ -1,0 +1,59 @@
+{
+  "layers": [
+    {
+      "id": 1,
+      "name": "cap color",
+      "height": 3000,
+      "width": 4000,
+      "mask": "m1-cap_color-color-default_000000-z1-n0.jpg",
+      "zIndex": 1,
+      "groupId": null,
+      "crop": {
+        "x": 0,
+        "y": 0
+      },
+      "zoom": 1,
+      "type": "color",
+      "color": "#000000",
+      "aspectRatio": 1.3333333333333333,
+      "noiseThreshold": 0
+    },
+    {
+      "id": 2,
+      "name": "cup design",
+      "height": 3000,
+      "width": 4000,
+      "mask": "m2-cup_design-design-z2-n0.04.jpg",
+      "design": "d2.png",
+      "zIndex": 2,
+      "groupId": null,
+      "crop": {
+        "x": 0,
+        "y": 0
+      },
+      "zoom": 1,
+      "type": "design",
+      "aspectRatio": 1,
+      "noiseThreshold": 0.04
+    }
+  ],
+  "groups": [
+    {
+      "id": 1,
+      "name": "Default Group"
+    }
+  ],
+  "global": {
+    "name": "coffee-cup",
+    "base": "beauty.jpg",
+    "uv": "uv.exr",
+    "brightness": 1,
+    "contrast": 1,
+    "highlightsIntensity": 2.7,
+    "uvTexture": null,
+    "baseTexture": null,
+    "canvasHeight": 3000,
+    "canvasWidth": 4000
+  },
+  "loading": true
+}
