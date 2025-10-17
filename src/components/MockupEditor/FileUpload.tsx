@@ -33,6 +33,9 @@ FileUploadProps) {
     console.log("croparea ref", croppedAreaPixelsRef.current);
     console.log("crop ref", croppedArea);
     console.log("zoom", zoom);
+    console.log("aspect", layer?.aspectRatio);
+    console.log("design", layer?.design);
+
     if (
       JSON.stringify(croppedAreaPixelsRef.current) ===
       JSON.stringify(croppedAreaPixels)
