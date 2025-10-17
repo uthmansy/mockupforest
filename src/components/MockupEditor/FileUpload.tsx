@@ -31,6 +31,8 @@ FileUploadProps) {
   const handleCropChange = (croppedArea, croppedAreaPixels) => {
     console.log("croparea", croppedAreaPixels);
     console.log("croparea ref", croppedAreaPixelsRef.current);
+    console.log("crop ref", croppedArea);
+    console.log("zoom", zoom);
     if (
       JSON.stringify(croppedAreaPixelsRef.current) ===
       JSON.stringify(croppedAreaPixels)
