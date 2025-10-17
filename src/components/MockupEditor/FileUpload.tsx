@@ -38,12 +38,25 @@ FileUploadProps) {
     console.log("crop", crop);
 
     if (
-      JSON.stringify(croppedAreaPixelsRef.current) ===
-      JSON.stringify(croppedAreaPixels)
-    )
+      crop &&
+      typeof crop.x === "number" &&
+      typeof crop.y === "number" &&
+      !isNaN(crop.x) &&
+      !isNaN(crop.y) &&
+      isFinite(crop.x) &&
+      isFinite(crop.y)
+    ) {
+      if (
+        JSON.stringify(croppedAreaPixelsRef.current) ===
+        JSON.stringify(croppedAreaPixels)
+      )
+        return;
+      updateLayer(layerId, { croppedAreaPixels, croppedArea });
+      croppedAreaPixelsRef.current = croppedAreaPixels;
+    } else {
+      setCrop({ x: 0, y: 0 });
       return;
-    updateLayer(layerId, { croppedAreaPixels, croppedArea });
-    croppedAreaPixelsRef.current = croppedAreaPixels;
+    }
   };
 
   // File input handler
