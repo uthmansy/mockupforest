@@ -27,14 +27,15 @@ FileUploadProps) {
   const [zoom, setZoom] = useState(1);
   const croppedAreaPixelsRef = useRef<Area | null | undefined>(null);
 
+  console.log("zoom", zoom);
+  console.log("aspect", layer?.aspectRatio);
+  console.log("design", layer?.design);
+
   //@ts-ignore
   const handleCropChange = (croppedArea, croppedAreaPixels) => {
     console.log("croparea", croppedAreaPixels);
     console.log("croparea ref", croppedAreaPixelsRef.current);
     console.log("crop ref", croppedArea);
-    console.log("zoom", zoom);
-    console.log("aspect", layer?.aspectRatio);
-    console.log("design", layer?.design);
 
     if (
       JSON.stringify(croppedAreaPixelsRef.current) ===
