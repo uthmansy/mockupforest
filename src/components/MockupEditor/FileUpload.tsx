@@ -26,14 +26,16 @@ FileUploadProps) {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const croppedAreaPixelsRef = useRef<Area | null | undefined>(null);
+
   //@ts-ignore
   const handleCropChange = (croppedArea, croppedAreaPixels) => {
+    console.log("croparea", croppedAreaPixels);
+    console.log("croparea ref", croppedAreaPixelsRef.current);
     if (
       JSON.stringify(croppedAreaPixelsRef.current) ===
       JSON.stringify(croppedAreaPixels)
     )
       return;
-    console.log("updating.........");
     updateLayer(layerId, { croppedAreaPixels, croppedArea });
     croppedAreaPixelsRef.current = croppedAreaPixels;
   };
@@ -75,24 +77,26 @@ FileUploadProps) {
           <span className="flex-1 truncate">{layer?.name}</span>
         </h5>
 
-        <Cropper
-          classes={{ containerClassName: "bg-white" }}
-          style={{
-            containerStyle: {
-              borderRadius: "5px",
-              height: 120,
-              width: "100%",
-              position: "relative",
-            },
-          }}
-          image={layer?.design || undefined}
-          crop={crop}
-          zoom={zoom}
-          aspect={layer?.aspectRatio}
-          onCropChange={setCrop}
-          onCropAreaChange={handleCropChange}
-          onZoomChange={setZoom}
-        />
+        {layer?.design && layer?.aspectRatio && (
+          <Cropper
+            classes={{ containerClassName: "bg-white" }}
+            style={{
+              containerStyle: {
+                borderRadius: "5px",
+                height: 120,
+                width: "100%",
+                position: "relative",
+              },
+            }}
+            image={layer?.design || undefined}
+            crop={crop}
+            zoom={zoom}
+            aspect={layer?.aspectRatio}
+            onCropChange={setCrop}
+            onCropAreaChange={handleCropChange}
+            onZoomChange={setZoom}
+          />
+        )}
       </div>
 
       <input

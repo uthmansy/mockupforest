@@ -19,16 +19,16 @@ function MobileBar() {
   return (
     <>
       <div className="min-h-max text-white fixed bottom-24 right-0 left-0 z-10 bg-inherit">
-        {currentLayer &&
-          (currentLayer?.type === "design" ? (
-            <FileUpload
-              key={currentLayer.id}
-              layerId={currentLayer.id}
-              label="Your Design"
-            />
-          ) : (
-            <Picker key={currentLayer?.id} layerId={currentLayer?.id} />
-          ))}
+        {currentLayer && (
+          <>
+            <div className={`${currentLayer?.type !== "design" && "hidden"}`}>
+              <FileUpload layerId={currentLayer.id} label="Your Design" />
+            </div>
+            <div className={`${currentLayer?.type !== "color" && "hidden"}`}>
+              <Picker layerId={currentLayer?.id} />
+            </div>
+          </>
+        )}
       </div>
       <div className="h-24 border-white/40 border-t flex items-center justify-center space-x-8 text-white">
         {layers.map((layer) => {
