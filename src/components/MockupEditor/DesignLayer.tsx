@@ -27,7 +27,7 @@ export const DesignLayer: React.FC<DesignLayerProps> = ({
   zIndex,
   croppedArea,
   shadowIntensity = 0,
-  highlightIntensity = 2.7,
+  highlightIntensity = 3.5,
   noiseAmount = 0,
 }) => {
   const { gl } = useThree();
@@ -256,9 +256,11 @@ export const DesignLayer: React.FC<DesignLayerProps> = ({
             float brightness = dot(baseCol, vec3(0.3333));
 
             // Normalize: shadows 0–0.2, highlights 0.2–1
-            float normalized = brightness < 0.5
-                ? brightness * 0.4
-                : 0.2 + (brightness - 0.5) * 1.6;
+            float mid = 0.5;
+            float t = smoothstep(mid - 0.4, mid + 0.4, brightness); // soft blend zone
+            float low = brightness * 1.2;
+            float high = 0.2 + (brightness - 0.5);
+            float normalized = mix(low, high, t);
 
             // Add noise
             float noise = random(vUv * 1024.0) * 2.0 - 1.0;
