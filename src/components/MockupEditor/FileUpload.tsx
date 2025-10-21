@@ -114,6 +114,7 @@ FileUploadProps) {
         type="file"
         accept={accept}
         onChange={createFileHandler((result) => {
+          if (!result.src) return;
           updateLayer(layerId, { design: result.src });
         })}
         className="w-full p-4 bg-neutral-600 hover:bg-neutral-700 transition-all duration-75 cursor-pointer rounded-md text-sm text-white/50 relative"

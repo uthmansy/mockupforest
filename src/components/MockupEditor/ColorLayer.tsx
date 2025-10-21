@@ -15,6 +15,7 @@ interface ColorLayerProps {
   shadowIntensity?: number;
   highlightIntensity?: number;
   noiseAmount?: number;
+  id: number;
 }
 
 export const ColorLayer: React.FC<ColorLayerProps> = ({
@@ -23,24 +24,39 @@ export const ColorLayer: React.FC<ColorLayerProps> = ({
   width,
   height,
   zIndex,
-  shadowIntensity = 0,
-  highlightIntensity = 3.5,
+  shadowIntensity = 0.7,
+  highlightIntensity = 1.5,
   noiseAmount = 0,
+  id,
 }) => {
   const { gl } = useThree();
   const setLoading = useLayersStore((s) => s.setLoading);
   const global = useGlobalSettingsStore(); // 👈 access shared global textures
+  const setColorLoading = useLayersStore((s) => s.setColorLoading);
 
   const maskTex = useRef<THREE.Texture | null>(null);
   const materialRef = useRef<THREE.ShaderMaterial>(null);
   const colorRef = useRef(new THREE.Color(color));
   const [ready, setReady] = useState(false);
 
+  const hasRenderedRef = useRef(false);
+
+  useFrame(() => {
+    if (!hasRenderedRef.current && materialRef.current) {
+      hasRenderedRef.current = true;
+      // Now it's been submitted to GPU at least once
+      // Optional: defer one more frame if you want extra safety
+      queueMicrotask(() => {
+        setColorLoading(id, false); // or notify parent
+      });
+    }
+  });
+
   // 🔹 Load only the mask (base is global now)
   useEffect(() => {
     let canceled = false;
     const loader = new THREE.TextureLoader();
-    setLoading(true);
+    setColorLoading(id, true);
 
     loader.load(
       mask,
@@ -55,13 +71,13 @@ export const ColorLayer: React.FC<ColorLayerProps> = ({
 
         maskTex.current = texture;
         setReady(true);
-        setLoading(false);
+        // setLoading(false);
       },
       undefined,
       (err) => {
         if (!canceled) {
           console.error("Error loading mask texture:", err);
-          setLoading(false);
+          setColorLoading(id, false);
         }
       }
     );
@@ -70,6 +86,7 @@ export const ColorLayer: React.FC<ColorLayerProps> = ({
       canceled = true;
       maskTex.current?.dispose();
       maskTex.current = null;
+      setColorLoading(id, false);
     };
   }, [mask, gl, setLoading]);
 
@@ -135,9 +152,9 @@ export const ColorLayer: React.FC<ColorLayerProps> = ({
             vec3 baseCol = texture2D(baseTexture, vUv).rgb;
 
             float brightness = dot(baseCol, vec3(0.3333));
-            float mid = 0.5;
-            float t = smoothstep(mid - 0.4, mid + 0.4, brightness); // soft blend zone
-            float low = brightness * 1.2;
+             float mid = 0.4;
+            float t = smoothstep(mid - 0.3, mid + 0.6, brightness); // soft blend zone
+            float low = brightness * 1.5;
             float high = 0.2 + (brightness - 0.5);
             float normalized = mix(low, high, t);
             // float normalized = brightness < 0.5
@@ -148,7 +165,7 @@ export const ColorLayer: React.FC<ColorLayerProps> = ({
             float noise = random(vUv * 1024.0) * 2.0 - 1.0;
             normalized = clamp(normalized + noise * noiseAmount, 0.0, 1.0);
 
-            float shadowFactor = mix(0.7, 1.0, normalized);
+            float shadowFactor = mix(1.0 - shadowIntensity, 1.0, normalized);
             float highlightFactor = smoothstep(0.2, 1.0, normalized) * highlightIntensity;
 
             float colorBrightness = dot(flatColor, vec3(0.3333));

@@ -1,0 +1,59 @@
+{
+  "layers": [
+    {
+      "id": 1,
+      "name": "background color",
+      "height": 3000,
+      "width": 4000,
+      "mask": "m1-background_color-color-default_000000-z2-n0.jpg",
+      "zIndex": 2,
+      "groupId": null,
+      "crop": {
+        "x": 0,
+        "y": 0
+      },
+      "zoom": 1,
+      "type": "color",
+      "color": "#000000",
+      "aspectRatio": 1.3333333333333333,
+      "noiseThreshold": 0
+    },
+    {
+      "id": 2,
+      "name": "paper",
+      "height": 3000,
+      "width": 4000,
+      "mask": "m2-paper-design-z2-n0.01.jpg",
+      "design": "d2.png",
+      "zIndex": 2,
+      "groupId": null,
+      "crop": {
+        "x": 0,
+        "y": 0
+      },
+      "zoom": 1,
+      "type": "design",
+      "aspectRatio": 1,
+      "noiseThreshold": 0.01
+    }
+  ],
+  "groups": [
+    {
+      "id": 1,
+      "name": "Default Group"
+    }
+  ],
+  "global": {
+    "name": "paper-6",
+    "base": "beauty.jpg",
+    "uv": "uv.exr",
+    "brightness": 1,
+    "contrast": 1,
+    "highlightsIntensity": 2.7,
+    "uvTexture": null,
+    "baseTexture": null,
+    "canvasHeight": 3000,
+    "canvasWidth": 4000
+  },
+  "loading": true
+}

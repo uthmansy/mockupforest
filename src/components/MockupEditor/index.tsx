@@ -75,8 +75,8 @@ export default function MockupEditor({ mockupData }: Props) {
           design: layer.design
             ? `https://mzjwyiqfusnwbzhtelvh.supabase.co/storage/v1/object/public/files/online-mockups/${data.global?.name}/${layer.design}`
             : null,
-          width: layer.width * 0.5,
-          height: layer.height * 0.5,
+          width: layer.width * 0.3,
+          height: layer.height * 0.3,
           // crop,
           // zoom,
           // aspectRatio,
@@ -125,8 +125,8 @@ export default function MockupEditor({ mockupData }: Props) {
         </div>
         <MockupCanvas
           setGlRef={setGlRef}
-          canvasWidth={canvasWidth * 0.5 || 2000}
-          canvasHeight={canvasHeight * 0.5 || 1500}
+          canvasWidth={canvasWidth * 0.3 || 2000}
+          canvasHeight={canvasHeight * 0.3 || 1500}
         />
       </div>
 

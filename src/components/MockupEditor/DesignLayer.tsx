@@ -17,6 +17,7 @@ interface DesignLayerProps {
   shadowIntensity?: number;
   highlightIntensity?: number;
   noiseAmount?: number;
+  id: number;
 }
 
 export const DesignLayer: React.FC<DesignLayerProps> = ({
@@ -26,12 +27,13 @@ export const DesignLayer: React.FC<DesignLayerProps> = ({
   height,
   zIndex,
   croppedArea,
-  shadowIntensity = 0,
-  highlightIntensity = 3.5,
+  shadowIntensity = 0.7,
+  highlightIntensity = 1.5,
   noiseAmount = 0,
+  id,
 }) => {
   const { gl } = useThree();
-  const setLoading = useLayersStore((s) => s.setLoading);
+  const setDesignLoading = useLayersStore((s) => s.setDesignLoading);
 
   const global = useGlobalSettingsStore();
   const uvTexture = global.uvTexture;
@@ -60,14 +62,30 @@ export const DesignLayer: React.FC<DesignLayerProps> = ({
     noiseAmountRef.current = noiseAmount;
   }, [shadowIntensity, highlightIntensity, noiseAmount]);
 
-  // Sync uniforms every frame (like ColorLayer)
   useFrame(() => {
-    if (materialRef.current) {
-      materialRef.current.uniforms.shadowIntensity.value =
-        shadowIntensityRef.current;
-      materialRef.current.uniforms.highlightIntensity.value =
-        highlightIntensityRef.current;
-      materialRef.current.uniforms.noiseAmount.value = noiseAmountRef.current;
+    const mat = materialRef.current;
+    if (!mat) return;
+
+    if (mat.uniforms.shadowIntensity.value !== shadowIntensityRef.current)
+      mat.uniforms.shadowIntensity.value = shadowIntensityRef.current;
+
+    if (mat.uniforms.highlightIntensity.value !== highlightIntensityRef.current)
+      mat.uniforms.highlightIntensity.value = highlightIntensityRef.current;
+
+    if (mat.uniforms.noiseAmount.value !== noiseAmountRef.current)
+      mat.uniforms.noiseAmount.value = noiseAmountRef.current;
+  });
+
+  const hasRenderedRef = useRef(false);
+
+  useFrame(() => {
+    if (!hasRenderedRef.current && materialRef.current) {
+      hasRenderedRef.current = true;
+      // Now it's been submitted to GPU at least once
+      // Optional: defer one more frame if you want extra safety
+      queueMicrotask(() => {
+        setDesignLoading(id, false); // or notify parent
+      });
     }
   });
 
@@ -82,13 +100,13 @@ export const DesignLayer: React.FC<DesignLayerProps> = ({
       setMaskTexture(null);
       setDesignDimensions({ width: 1, height: 1 });
       if (isLoadingRef.current) {
-        setLoading(false);
+        // setDesignLoading(id, false);
         isLoadingRef.current = false;
       }
       return;
     }
 
-    setLoading(true);
+    setDesignLoading(id, true);
     isLoadingRef.current = true;
     let canceled = false;
 
@@ -130,14 +148,15 @@ export const DesignLayer: React.FC<DesignLayerProps> = ({
         if (!canceled) {
           setDesignTexture(designTex);
           setMaskTexture(maskTex);
-          setLoading(false);
+          if (hasRenderedRef.current) setDesignLoading(id, false);
+          // setDesignLoading(id, false);
           isLoadingRef.current = false;
         }
       })
       .catch((err) => {
         if (!canceled) {
           console.error("Texture load error:", err);
-          setLoading(false);
+          setDesignLoading(id, false);
           isLoadingRef.current = false;
         }
       });
@@ -145,11 +164,11 @@ export const DesignLayer: React.FC<DesignLayerProps> = ({
     return () => {
       canceled = true;
       if (isLoadingRef.current) {
-        setLoading(false);
+        setDesignLoading(id, false);
         isLoadingRef.current = false;
       }
     };
-  }, [uvTexture, design, mask, global.base, gl, setLoading]);
+  }, [uvTexture, design, mask, global.base, gl, setDesignLoading]);
 
   const uniforms = useMemo(() => {
     if (
@@ -256,9 +275,9 @@ export const DesignLayer: React.FC<DesignLayerProps> = ({
             float brightness = dot(baseCol, vec3(0.3333));
 
             // Normalize: shadows 0–0.2, highlights 0.2–1
-            float mid = 0.5;
-            float t = smoothstep(mid - 0.4, mid + 0.4, brightness); // soft blend zone
-            float low = brightness * 1.2;
+            float mid = 0.4;
+            float t = smoothstep(mid - 0.3, mid + 0.6, brightness); // soft blend zone
+            float low = brightness * 1.5;
             float high = 0.2 + (brightness - 0.5);
             float normalized = mix(low, high, t);
 
@@ -267,7 +286,8 @@ export const DesignLayer: React.FC<DesignLayerProps> = ({
             normalized = clamp(normalized + noise * noiseAmount, 0.0, 1.0);
 
             // Lighting factors
-            float shadowFactor = mix(0.7, 1.0, normalized);
+            // float shadowFactor = mix(0.7, 1.0, normalized);
+            float shadowFactor = mix(1.0 - shadowIntensity, 1.0, normalized);
             float highlightFactor = smoothstep(0.2, 1.0, normalized) * highlightIntensity;
 
             // Apply lighting to design color (not flat color)

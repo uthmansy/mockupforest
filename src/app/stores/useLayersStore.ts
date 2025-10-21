@@ -31,6 +31,9 @@ export interface LayersState {
   layers: Layer[];
   groups: Group[];
   loading: boolean;
+  baseAndUvLoading: boolean;
+  designLoadings: Record<number, boolean>;
+  colorLoadings: Record<number, boolean>;
 
   // Layer actions
   setLayers: (layers: Layer[]) => void;
@@ -47,12 +50,20 @@ export interface LayersState {
 
   // Loading
   setLoading: (loading: boolean) => void;
+  setBaseAndUvLoading: (baseAndUvLoading: boolean) => void;
+  setDesignLoading: (id: number, isLoading: boolean) => void;
+  setColorLoading: (id: number, isLoading: boolean) => void;
+  clearAllDesignLoadings: () => void;
+  clearAllColorLoadings: () => void;
 }
 
 export const useLayersStore = create<LayersState>((set) => ({
   layers: [],
   groups: [],
   loading: true,
+  baseAndUvLoading: true,
+  designLoadings: {},
+  colorLoadings: {},
 
   // Layer actions
   setLayers: (layers) => set({ layers }),
@@ -93,4 +104,16 @@ export const useLayersStore = create<LayersState>((set) => ({
 
   // Loading
   setLoading: (loading) => set({ loading }),
+  setBaseAndUvLoading: (baseAndUvLoading) => set({ baseAndUvLoading }),
+  setDesignLoading: (id, isLoading) =>
+    set((state) => ({
+      designLoadings: { ...state.designLoadings, [id]: isLoading },
+    })),
+  setColorLoading: (id, isLoading) =>
+    set((state) => ({
+      colorLoadings: { ...state.colorLoadings, [id]: isLoading },
+    })),
+
+  clearAllDesignLoadings: () => set({ designLoadings: {} }),
+  clearAllColorLoadings: () => set({ colorLoadings: {} }),
 }));

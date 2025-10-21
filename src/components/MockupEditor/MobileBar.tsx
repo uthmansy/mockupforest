@@ -9,7 +9,7 @@ import { MdImage } from "react-icons/md";
 
 function MobileBar() {
   const layers = useSidebarStore((state) => state.sidebarLayers);
-  const [currentLayerId, setCurrentLayerId] = useState<number>(2);
+  const [currentLayerId, setCurrentLayerId] = useState<number>(1);
   const [currentLayer, setCurrentLayer] = useState<SidebarLayer | null>(null);
 
   useEffect(() => {
@@ -19,16 +19,31 @@ function MobileBar() {
   return (
     <>
       <div className="min-h-max text-white fixed bottom-24 right-0 left-0 z-10 bg-inherit">
-        {currentLayer && (
-          <>
-            <div className={`${currentLayer?.type !== "design" && "hidden"}`}>
-              <FileUpload layerId={currentLayer.id} label="Your Design" />
+        {layers.map((layer) => {
+          return layer.type === "design" ? (
+            <div
+              key={layer.id}
+              className={`${
+                layer.id === currentLayerId
+                  ? "visible relative"
+                  : "invisible absolute"
+              }`}
+            >
+              <FileUpload layerId={layer.id} label="Your Design" />
             </div>
-            <div className={`${currentLayer?.type !== "color" && "hidden"}`}>
-              <Picker layerId={currentLayer?.id} />
+          ) : (
+            <div
+              key={layer.id}
+              className={`${
+                layer.id === currentLayerId
+                  ? "visible relative"
+                  : "invisible absolute"
+              }`}
+            >
+              <Picker layerId={layer.id} />
             </div>
-          </>
-        )}
+          );
+        })}
       </div>
       <div className="h-24 border-white/40 border-t flex items-center justify-center space-x-8 text-white">
         {layers.map((layer) => {
