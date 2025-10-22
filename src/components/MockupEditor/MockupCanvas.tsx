@@ -60,6 +60,7 @@ export const MockupCanvas: React.FC<MockupCanvasProps> = ({
     if (values.length === 0) return true; // waiting for first registration
     return values.some(Boolean); // any still loading
   }, [designLoadings, designLayers]);
+
   const isAnyColorLoading = useMemo(() => {
     const values = Object.values(colorLoadings);
     const hasColorLayers = colorLayers.length > 0;
@@ -116,6 +117,8 @@ export const MockupCanvas: React.FC<MockupCanvasProps> = ({
             zIndex={layer.zIndex}
             croppedArea={layer.croppedAreaPixels}
             noiseAmount={layer.noiseThreshold}
+            highlightIntensity={layer.highlightsIntensity}
+            shadowIntensity={layer.shadowIntensity}
           />
         );
       }
@@ -129,6 +132,8 @@ export const MockupCanvas: React.FC<MockupCanvasProps> = ({
           color={layer.color}
           noiseAmount={layer.noiseThreshold}
           id={layer.id}
+          highlightIntensity={layer.highlightsIntensity}
+          shadowIntensity={layer.shadowIntensity}
         />
       );
     });

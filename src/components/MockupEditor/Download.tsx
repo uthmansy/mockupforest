@@ -32,12 +32,12 @@ function Download({ glRef }: Props) {
     <button
       onClick={handleDownload}
       disabled={isExporting}
-      className="w-14 h-14 flex items-center justify-center bg-white"
+      className="bg-secondary-bg rounded-md px-5 py-3 uppercase text-sm"
       style={{
         cursor: isExporting ? "not-allowed" : "pointer",
       }}
     >
-      {isExporting ? "Exporting..." : <GrDownload className="text-lg" />}
+      {isExporting ? "Exporting..." : "Downlaod"}
     </button>
   );
 }

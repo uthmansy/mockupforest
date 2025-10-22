@@ -27,8 +27,8 @@ export const DesignLayer: React.FC<DesignLayerProps> = ({
   height,
   zIndex,
   croppedArea,
-  shadowIntensity = 0.7,
-  highlightIntensity = 1.5,
+  shadowIntensity = 0.55,
+  highlightIntensity = 1.42,
   noiseAmount = 0,
   id,
 }) => {
@@ -230,7 +230,7 @@ export const DesignLayer: React.FC<DesignLayerProps> = ({
       <planeGeometry args={[width, height]} />
       <shaderMaterial
         ref={materialRef}
-        key={`${designTexture?.uuid}-${croppedArea?.x}-${croppedArea?.y}`}
+        key={`${designTexture?.uuid}-${croppedArea?.x}-${croppedArea?.y}-${shadowIntensity}-${highlightIntensity}-${noiseAmount}`}
         transparent
         depthTest
         depthWrite={false}
@@ -243,12 +243,12 @@ export const DesignLayer: React.FC<DesignLayerProps> = ({
           }
         `}
         fragmentShader={`
-          precision highp float;
+         precision highp float;
 
           uniform sampler2D uvPassTexture;
           uniform sampler2D designTexture;
           uniform sampler2D maskTexture;
-          uniform sampler2D baseTexture; // ← lighting info
+          uniform sampler2D baseTexture; // lighting info
           uniform vec2 cropOffset;
           uniform vec2 cropScale;
           uniform float shadowIntensity;
@@ -275,30 +275,43 @@ export const DesignLayer: React.FC<DesignLayerProps> = ({
             float brightness = dot(baseCol, vec3(0.3333));
 
             // Normalize: shadows 0–0.2, highlights 0.2–1
-            float mid = 0.4;
-            float t = smoothstep(mid - 0.3, mid + 0.6, brightness); // soft blend zone
-            float low = brightness * 1.5;
-            float high = 0.2 + (brightness - 0.5);
+            float mid = 0.35;
+            float t = smoothstep(mid - 0.3, mid + 0.67, brightness);
+            // float low = brightness * 1.5;
+            float low = pow(brightness, 1.2) * 1.5;
+            float high = 0.2 + (brightness - 0.55);
             float normalized = mix(low, high, t);
 
             // Add noise
             float noise = random(vUv * 1024.0) * 2.0 - 1.0;
             normalized = clamp(normalized + noise * noiseAmount, 0.0, 1.0);
 
+            // --- Adaptive brightness calibration ---
+
+            // Compute the base brightness of the design
+            float designBrightness = dot(designColor.rgb, vec3(0.299, 0.587, 0.114));
+
+            // Soften compression: only reduce brightness slightly for very bright designs
+            float adaptiveScale = mix(1.0, 0.85, smoothstep(0.8, 1.0, designBrightness));
+            vec3 calibratedDesign = designColor.rgb * adaptiveScale;
+
+            // Adaptive shadow intensity: brighter designs get a *bit* stronger shadow
+            float adaptiveShadowIntensity = shadowIntensity * mix(1.0, 1.25, smoothstep(0.6, 1.0, designBrightness));
+
             // Lighting factors
-            // float shadowFactor = mix(0.7, 1.0, normalized);
-            float shadowFactor = mix(1.0 - shadowIntensity, 1.0, normalized);
+            float shadowFactor = mix(1.0 - adaptiveShadowIntensity, 1.0, normalized);
             float highlightFactor = smoothstep(0.2, 1.0, normalized) * highlightIntensity;
 
-            // Apply lighting to design color (not flat color)
-            vec3 designRGB = designColor.rgb;
-            float colorBrightness = dot(designRGB, vec3(0.3333));
-            vec3 shadowed = designRGB * shadowFactor;
+            // Apply lighting to calibrated color
+            vec3 shadowed = calibratedDesign * shadowFactor;
+            float colorBrightness = dot(calibratedDesign, vec3(0.3333));
             float highlightBoost = (1.0 - colorBrightness) * 0.5;
-            vec3 highlighted = designRGB + baseCol * highlightFactor * (1.0 + highlightBoost);
+            vec3 highlighted = calibratedDesign + baseCol * highlightFactor * (1.0 + highlightBoost);
 
+            // Combine with adaptive tone compression to prevent blowout
             vec3 finalCol = mix(shadowed, highlighted, normalized);
-            finalCol = max(finalCol, designRGB * 0.3); // brightness floor
+            finalCol = clamp(finalCol, 0.0, 1.0);
+            finalCol = max(finalCol, calibratedDesign * 0.3); // brightness floor
 
             // Smooth mask alpha
             float maskValue = texture2D(maskTexture, vUv).r;
@@ -306,6 +319,7 @@ export const DesignLayer: React.FC<DesignLayerProps> = ({
 
             gl_FragColor = vec4(finalCol, alpha);
           }
+
         `}
       />
     </mesh>

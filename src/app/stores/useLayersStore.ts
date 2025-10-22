@@ -25,6 +25,8 @@ export interface Layer {
   color?: string;
   aspectRatio?: number;
   noiseThreshold: number;
+  highlightsIntensity?: number;
+  shadowIntensity?: number;
 }
 
 export interface LayersState {

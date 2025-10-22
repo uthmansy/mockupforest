@@ -24,8 +24,8 @@ export const ColorLayer: React.FC<ColorLayerProps> = ({
   width,
   height,
   zIndex,
-  shadowIntensity = 0.7,
-  highlightIntensity = 1.5,
+  shadowIntensity = 0.55,
+  highlightIntensity = 1.42,
   noiseAmount = 0,
   id,
 }) => {
@@ -112,6 +112,7 @@ export const ColorLayer: React.FC<ColorLayerProps> = ({
     <mesh position={[0, 0, zIndex]}>
       <planeGeometry args={[width, height]} />
       <shaderMaterial
+        key={`${shadowIntensity}-${highlightIntensity}-${noiseAmount}`}
         ref={materialRef}
         transparent
         depthTest
@@ -132,7 +133,7 @@ export const ColorLayer: React.FC<ColorLayerProps> = ({
           }
         `}
         fragmentShader={`
-          precision highp float;
+         precision highp float;
 
           uniform sampler2D maskTexture;
           uniform sampler2D baseTexture;
@@ -143,42 +144,59 @@ export const ColorLayer: React.FC<ColorLayerProps> = ({
 
           varying vec2 vUv;
 
+          // Simple hash-based noise
           float random(vec2 st) {
             return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
           }
 
           void main() {
+            // --- Sample base and mask ---
             vec4 mask = texture2D(maskTexture, vUv);
+            if (mask.a < 0.01 && mask.r < 0.01) discard;
+
             vec3 baseCol = texture2D(baseTexture, vUv).rgb;
 
+            // --- Base lighting normalization ---
             float brightness = dot(baseCol, vec3(0.3333));
-             float mid = 0.4;
-            float t = smoothstep(mid - 0.3, mid + 0.6, brightness); // soft blend zone
-            float low = brightness * 1.5;
-            float high = 0.2 + (brightness - 0.5);
+            float mid = 0.35;
+            float t = smoothstep(mid - 0.3, mid + 0.67, brightness);
+            // float low = brightness * 1.5;
+            float low = pow(brightness, 1.2) * 1.5;
+            float high = 0.2 + (brightness - 0.55);
             float normalized = mix(low, high, t);
-            // float normalized = brightness < 0.5
-            //     ? brightness * 1.2        // expand shadows
-            //     : 0.6 + (brightness - 0.5) * 0.8; // compress highlights slightly
 
-
+            // --- Add slight procedural noise ---
             float noise = random(vUv * 1024.0) * 2.0 - 1.0;
             normalized = clamp(normalized + noise * noiseAmount, 0.0, 1.0);
 
-            float shadowFactor = mix(1.0 - shadowIntensity, 1.0, normalized);
+            // --- Adaptive brightness calibration ---
+            float colorBrightness = dot(flatColor, vec3(0.299, 0.587, 0.114));
+
+            // Slightly compress very bright colors so white areas don’t blow out
+            float adaptiveScale = mix(1.0, 0.85, smoothstep(0.8, 1.0, colorBrightness));
+            vec3 calibratedColor = flatColor * adaptiveScale;
+
+            // Adaptive shadow: brighter colors get slightly stronger shadows
+            float adaptiveShadowIntensity = shadowIntensity * mix(1.0, 1.25, smoothstep(0.6, 1.0, colorBrightness));
+
+            // --- Lighting factors ---
+            float shadowFactor = mix(1.0 - adaptiveShadowIntensity, 1.0, normalized);
             float highlightFactor = smoothstep(0.2, 1.0, normalized) * highlightIntensity;
 
-            float colorBrightness = dot(flatColor, vec3(0.3333));
-            vec3 shadowed = flatColor * shadowFactor;
+            // --- Apply lighting ---
+            vec3 shadowed = calibratedColor * shadowFactor;
             float highlightBoost = (1.0 - colorBrightness) * 0.5;
-            vec3 highlighted = flatColor + baseCol * highlightFactor * (1.0 + highlightBoost);
+            vec3 highlighted = calibratedColor + baseCol * highlightFactor * (1.0 + highlightBoost);
 
             vec3 finalCol = mix(shadowed, highlighted, normalized);
-            finalCol = max(finalCol, flatColor * 0.3);
+            finalCol = clamp(finalCol, 0.0, 1.0);
+            finalCol = max(finalCol, calibratedColor * 0.3); // brightness floor
 
+            // --- Smooth mask edge ---
             float alpha = smoothstep(0.1, 0.3, mask.r);
             gl_FragColor = vec4(finalCol, alpha);
           }
+
         `}
       />
     </mesh>

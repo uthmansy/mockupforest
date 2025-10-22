@@ -3,15 +3,9 @@ import Container from "@/components/Container";
 import Footer from "@/components/Footer";
 import GalleryGrid from "@/components/GalleryGrid";
 import Header from "@/components/Header";
+import { Mockup } from "@/components/MockupGallery";
 import PaginationControls from "@/components/PaginationControls";
 import { algoliaResponse } from "@/lib/algoliaSearch";
-
-export interface Mockup {
-  id: string;
-  slug: string;
-  title: string;
-  thumbnailUrl: string;
-}
 
 interface SearchPageProps {
   searchParams: Promise<{ query?: string; page?: string }>;
@@ -42,6 +36,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         slug: hit.slug,
         title: hit.title,
         thumbnailUrl: hit.preview_url ?? "/placeholder.jpg",
+        isEditable: hit.is_editable,
       }));
 
       totalHits = response.nbHits ?? 0;

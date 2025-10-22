@@ -10,6 +10,8 @@ import { Mockup } from "@/types/db";
 import { Group, Layer, useLayersStore } from "@/app/stores/useLayersStore";
 import { useSidebarStore } from "@/app/stores/useSidebarStore";
 import { useGlobalSettingsStore } from "@/app/stores/useGlobalSettingsStore";
+import { useAuthStore } from "@/app/stores/useAuthStore";
+import SettingsPanel from "./SettingsPanel";
 
 interface Props {
   mockupData?: Mockup;
@@ -24,6 +26,15 @@ export default function MockupEditor({ mockupData }: Props) {
   const { setLayers, setGroups, layers } = useLayersStore();
   const { syncWithLayers } = useSidebarStore();
   const { updateGlobal, canvasHeight, canvasWidth } = useGlobalSettingsStore();
+
+  const { loading, user, checkLoginStatus } = useAuthStore();
+
+  useEffect(() => {
+    const handleSession = async () => {
+      await checkLoginStatus();
+    };
+    handleSession();
+  }, []);
 
   useEffect(() => {
     setIsMounted(true);
@@ -120,8 +131,9 @@ export default function MockupEditor({ mockupData }: Props) {
       )}
 
       <div className="flex-1 flex flex-col">
-        <div className="h-14 border-white/20 border-b bg-neutral-800 flex items-center justify-end">
+        <div className="h-14 border-white/20 border-b bg-neutral-800 flex items-center justify-end space-x-3 px-6">
           {glRef && <Download glRef={glRef} />}
+          {user && <SettingsPanel mockupId={mockupData.id} />}
         </div>
         <MockupCanvas
           setGlRef={setGlRef}
