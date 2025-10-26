@@ -83,7 +83,7 @@ FileUploadProps) {
   return (
     <div className="md:mb-4 p-6 md:p-0">
       <div className="my-5">
-        <h5 className="uppercase text-sm flex items-center space-x-2 mb-5">
+        <h5 className="uppercase text-sm flex items-center space-x-2 mb-5 text-sage-light">
           <LuImage className="text-2xl" />
           <span className="flex-1 truncate">{layer?.name}</span>
         </h5>

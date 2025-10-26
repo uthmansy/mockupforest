@@ -49,7 +49,7 @@ export default function RootLayout({
           `}
         </Script>
       </head>
-      <body className="antialiased font-light">
+      <body className="antialiased">
         <main>{children}</main>
       </body>
     </html>

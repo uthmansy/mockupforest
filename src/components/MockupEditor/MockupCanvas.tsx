@@ -97,7 +97,10 @@ export const MockupCanvas: React.FC<MockupCanvasProps> = ({
 
   // Memoize layers rendering
   const renderedLayers = useMemo(() => {
-    return layers.map((layer) => {
+    // Sort layers by zIndex before mapping
+    const sortedLayers = [...layers].sort((a, b) => a.zIndex - b.zIndex);
+
+    return sortedLayers.map((layer) => {
       if (layer.type === "design") {
         return (
           <DesignLayer
@@ -115,6 +118,7 @@ export const MockupCanvas: React.FC<MockupCanvasProps> = ({
           />
         );
       }
+
       return (
         <ColorLayer
           key={layer.id}
@@ -130,7 +134,7 @@ export const MockupCanvas: React.FC<MockupCanvasProps> = ({
         />
       );
     });
-  }, [layers]); // Only re-render when layers change
+  }, [layers]);
 
   return (
     <div className="relative w-full h-full flex items-start md:items-center justify-center overflow-hidden p-6 bg-neutral-800">
