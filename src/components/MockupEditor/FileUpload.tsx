@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { useLayersStore } from "@/app/stores/useLayersStore";
 import Cropper, { Area } from "react-easy-crop";
-import { SlLayers } from "react-icons/sl";
+import { LuImage } from "react-icons/lu";
 
 interface FileUploadProps {
   label: string;
@@ -83,14 +83,14 @@ FileUploadProps) {
   return (
     <div className="md:mb-4 p-6 md:p-0">
       <div className="my-5">
-        <h5 className="uppercase text-sm flex items-center space-x-2">
-          <SlLayers className="text-lg" />
+        <h5 className="uppercase text-sm flex items-center space-x-2 mb-5">
+          <LuImage className="text-2xl" />
           <span className="flex-1 truncate">{layer?.name}</span>
         </h5>
 
         {layer?.design && layer?.aspectRatio && (
           <Cropper
-            classes={{ containerClassName: "bg-white" }}
+            classes={{ containerClassName: "bg-black" }}
             style={{
               containerStyle: {
                 borderRadius: "5px",
@@ -117,7 +117,7 @@ FileUploadProps) {
           if (!result.src) return;
           updateLayer(layerId, { design: result.src });
         })}
-        className="w-full p-4 bg-neutral-600 hover:bg-neutral-700 transition-all duration-75 cursor-pointer rounded-md text-sm text-white/50 relative"
+        className="w-full h-12 p-3 bg-neutral-700 hover:bg-neutral-800 transition-all duration-75 cursor-pointer rounded-md text-sm text-white/50 relative"
       />
     </div>
   );

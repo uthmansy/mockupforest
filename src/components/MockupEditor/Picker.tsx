@@ -3,8 +3,8 @@
 import { useLayersStore } from "@/app/stores/useLayersStore";
 import React, { useState, useEffect, useRef } from "react";
 import { HexColorPicker } from "react-colorful";
-import { SlLayers } from "react-icons/sl";
 import { motion, AnimatePresence } from "framer-motion";
+import { CiPalette } from "react-icons/ci";
 
 interface Props {
   layerId: number;
@@ -56,22 +56,22 @@ function Picker({ layerId }: Props) {
   return (
     <div className="flex flex-col gap-2 w-full p-6 my-5 md:p-0">
       <h5 className="uppercase text-sm flex items-center space-x-2">
-        <SlLayers className="text-lg" />
+        <CiPalette className="text-2xl" />
         <span className="flex-1 truncate">{layer.name}</span>
       </h5>
 
       <div className="relative">
-        <div className="flex space-x-4" ref={pickerBoxRef}>
+        <div className="flex space-x-3" ref={pickerBoxRef}>
           <div
             style={{ background: inputValue }}
-            className="w-14 h-14 cursor-pointer rounded-md"
+            className="w-12 h-12 cursor-pointer rounded-md border-white/30 border"
             onClick={() => setShowPicker((prev) => !prev)}
           />
           <input
             type="text"
             value={inputValue}
             onChange={(e) => handleInputChange(e.target.value)}
-            className="w-full p-4 bg-neutral-600 hover:bg-neutral-700 transition-all duration-75 cursor-pointer rounded-md text-sm text-white/50 flex-1"
+            className="w-full p-2 bg-neutral-700 hover:bg-neutral-800 transition-all duration-75 cursor-pointer rounded-md text-sm text-white/50 flex-1"
             placeholder="#RRGGBB"
           />
         </div>

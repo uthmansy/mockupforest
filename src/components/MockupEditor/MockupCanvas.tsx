@@ -17,7 +17,6 @@ import BaseLayer from "./BaseLayer";
 import { useLayersStore } from "@/app/stores/useLayersStore";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { ColorLayer } from "./ColorLayer";
-import { EXRLoader } from "three/examples/jsm/Addons.js";
 import { useGlobalSettingsStore } from "@/app/stores/useGlobalSettingsStore";
 import { useTextures } from "@/app/hooks/useTextures";
 
@@ -35,14 +34,8 @@ export const MockupCanvas: React.FC<MockupCanvasProps> = ({
   setGlRef,
 }) => {
   const glRef = useRef<THREE.WebGLRenderer>(null);
-  const {
-    layers,
-    loading,
-    setLoading,
-    baseAndUvLoading,
-    designLoadings,
-    colorLoadings,
-  } = useLayersStore();
+  const { layers, baseAndUvLoading, designLoadings, colorLoadings } =
+    useLayersStore();
   const designLayers = useMemo(
     () => layers.filter((l) => l.type === "design"),
     [layers]
@@ -140,15 +133,15 @@ export const MockupCanvas: React.FC<MockupCanvasProps> = ({
   }, [layers]); // Only re-render when layers change
 
   return (
-    <div className="relative w-full h-full flex items-start md:items-center justify-center overflow-hidden p-6">
+    <div className="relative w-full h-full flex items-start md:items-center justify-center overflow-hidden p-6 bg-neutral-800">
       {(baseAndUvLoading || isAnyDesignLoading || isAnyColorLoading) && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black backdrop-blur-xs text-white z-50">
+        <div className="absolute inset-0 flex flex-col items-center justify-center  backdrop-blur-xs text-white z-50 bg-neutral-800">
           <AiOutlineLoading3Quarters className="animate-spin text-5xl mb-4" />
           <p className="text-sm uppercase tracking-wider">Loading..</p>
         </div>
       )}
       <div
-        className="relative flex items-center justify-center w-full max-w-[800px] bg-gray-200 overflow-hidden rounded-lg"
+        className="relative flex items-center justify-center w-full max-w-[800px] bg-gray-200 overflow-hidden shadow-md"
         style={{ aspectRatio }}
       >
         <Canvas

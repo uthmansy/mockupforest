@@ -11,23 +11,17 @@ export default function Sidebar() {
 
   return (
     <aside className="w-full  text-white">
-      <div className="space-y-6">
-        <div>
-          <div className="mb-6">
-            {layers.map((layer) => {
-              return layer.type === "design" ? (
-                <FileUpload
-                  key={layer.id}
-                  layerId={layer.id}
-                  label="Your Design"
-                />
-              ) : (
-                <Picker key={layer.id} layerId={layer.id} />
-              );
-            })}
+      {layers.map((layer) => {
+        return layer.type === "design" ? (
+          <div key={layer.id} className="border-b border-white/10 p-3">
+            <FileUpload layerId={layer.id} label="Your Design" />
           </div>
-        </div>
-      </div>
+        ) : (
+          <div key={layer.id} className="border-b border-white/10 p-3">
+            <Picker layerId={layer.id} />
+          </div>
+        );
+      })}
     </aside>
   );
 }

@@ -1,6 +1,5 @@
 "use client";
 import { useGlobalSettingsStore } from "@/app/stores/useGlobalSettingsStore";
-import { useLayersStore } from "@/app/stores/useLayersStore";
 import React, { RefObject, useState } from "react";
 import { GrDownload } from "react-icons/gr";
 import * as THREE from "three";
@@ -32,7 +31,7 @@ function Download({ glRef }: Props) {
     <button
       onClick={handleDownload}
       disabled={isExporting}
-      className="bg-secondary-bg rounded-md px-5 py-3 uppercase text-sm"
+      className="bg-secondary-bg rounded-md px-5 py-2 uppercase text-sm"
       style={{
         cursor: isExporting ? "not-allowed" : "pointer",
       }}

@@ -12,6 +12,8 @@ import { useSidebarStore } from "@/app/stores/useSidebarStore";
 import { useGlobalSettingsStore } from "@/app/stores/useGlobalSettingsStore";
 import { useAuthStore } from "@/app/stores/useAuthStore";
 import SettingsPanel from "./SettingsPanel";
+import Link from "next/link";
+import Image from "next/image";
 
 interface Props {
   mockupData?: Mockup;
@@ -86,8 +88,8 @@ export default function MockupEditor({ mockupData }: Props) {
           design: layer.design
             ? `https://mzjwyiqfusnwbzhtelvh.supabase.co/storage/v1/object/public/files/online-mockups/${data.global?.name}/${layer.design}`
             : null,
-          width: layer.width * 0.3,
-          height: layer.height * 0.3,
+          width: layer.width * 0.5,
+          height: layer.height * 0.5,
           // crop,
           // zoom,
           // aspectRatio,
@@ -123,22 +125,35 @@ export default function MockupEditor({ mockupData }: Props) {
   }
 
   return (
-    <div className="h-screen flex flex-col md:flex-row bg-black overflow-hidden">
+    <div className="h-screen flex flex-col md:flex-row overflow-hidden">
       {isLargeScreen && (
-        <div className="md:w-60 xl:w-72 h-full overflow-y-auto max-h-full bg-neutral-800 border-white/20 p-6 py-10 border-r-[0.5px] scrollbar-dark">
+        <div className="md:w-60 xl:w-72 h-full overflow-y-auto max-h-full bg-neutral-900 border-white/20 border-r-[0.5px] scrollbar-dark">
+          <div className="h-15 max-h-15 flex items-center p-3">
+            <Link href="/">
+              <Image
+                src="/dark-logo.png"
+                alt="MockupForest logo"
+                width={120}
+                height={30}
+                priority
+              />
+            </Link>
+          </div>
           <Sidebar />
         </div>
       )}
 
       <div className="flex-1 flex flex-col">
-        <div className="h-14 border-white/20 border-b bg-neutral-800 flex items-center justify-end space-x-3 px-6">
+        <div className="h-15 border-white/20 border-b flex items-center justify-end space-x-2 px-6 bg-neutral-900">
           {glRef && <Download glRef={glRef} />}
-          {user && <SettingsPanel mockupId={mockupData.id} />}
+          {user && glRef && (
+            <SettingsPanel glRef={glRef} mockupId={mockupData.id} />
+          )}
         </div>
         <MockupCanvas
           setGlRef={setGlRef}
-          canvasWidth={canvasWidth * 0.3 || 2000}
-          canvasHeight={canvasHeight * 0.3 || 1500}
+          canvasWidth={canvasWidth * 0.5 || 2000}
+          canvasHeight={canvasHeight * 0.5 || 1500}
         />
       </div>
 

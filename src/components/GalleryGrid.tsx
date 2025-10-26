@@ -23,7 +23,7 @@ export default function GalleryGrid({ mockups }: GalleryGridProps) {
                   alt={item.title}
                   fill
                   sizes="(max-width: 768px) 100vw, 100vw"
-                  className="object-cover overflow-hidden transition-all duration-300 scale-125 hover:scale-135"
+                  className="object-cover overflow-hidden transition-all duration-300 scale-110 hover:scale-125"
                   quality={80}
                   priority={false}
                 />
