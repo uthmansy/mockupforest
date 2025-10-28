@@ -36,7 +36,7 @@ function Download({ glRef }: Props) {
         cursor: isExporting ? "not-allowed" : "pointer",
       }}
     >
-      {isExporting ? "Exporting..." : "Downlaod"}
+      {isExporting ? "Exporting..." : "Export"}
     </button>
   );
 }

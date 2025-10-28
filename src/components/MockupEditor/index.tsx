@@ -14,6 +14,7 @@ import { useAuthStore } from "@/app/stores/useAuthStore";
 import SettingsPanel from "./SettingsPanel";
 import Link from "next/link";
 import Image from "next/image";
+import AppHeader from "./AppHeader";
 
 interface Props {
   mockupData?: Mockup;
@@ -128,28 +129,12 @@ export default function MockupEditor({ mockupData }: Props) {
     <div className="h-screen flex flex-col md:flex-row overflow-hidden">
       {isLargeScreen && (
         <div className="md:w-60 xl:w-72 h-full overflow-y-auto max-h-full bg-neutral-900 border-white/20 border-r-[0.5px] scrollbar-dark">
-          <div className="h-15 max-h-15 flex items-center p-3">
-            <Link href="/">
-              <Image
-                src="/dark-logo.png"
-                alt="MockupForest logo"
-                width={120}
-                height={30}
-                priority
-              />
-            </Link>
-          </div>
           <Sidebar />
         </div>
       )}
 
       <div className="flex-1 flex flex-col">
-        <div className="h-15 border-white/20 border-b flex items-center justify-end space-x-2 px-6 bg-neutral-900">
-          {glRef && <Download glRef={glRef} />}
-          {user && glRef && (
-            <SettingsPanel glRef={glRef} mockupId={mockupData.id} />
-          )}
-        </div>
+        <AppHeader glRef={glRef} mockupData={mockupData} user={user} />
         <MockupCanvas
           setGlRef={setGlRef}
           canvasWidth={canvasWidth * 0.5 || 2000}

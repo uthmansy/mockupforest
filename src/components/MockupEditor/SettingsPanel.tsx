@@ -1,15 +1,41 @@
 "use client";
-import React, { RefObject, useState } from "react";
+import React, { RefObject, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLayersStore } from "@/app/stores/useLayersStore";
 import { supabase } from "@/lib/supabaseClient";
 import * as THREE from "three";
 import { useGlobalSettingsStore } from "@/app/stores/useGlobalSettingsStore";
+import { getMockupById } from "@/app/lib/utils";
+import { Mockup } from "@/types/db";
 
 interface Props {
   mockupId: string;
   glRef: RefObject<THREE.WebGLRenderer | null>;
 }
+
+// Predefined categories list
+const PREDEFINED_CATEGORIES = [
+  "business",
+  "modern",
+  "minimal",
+  "creative",
+  "elegant",
+  "professional",
+  "technology",
+  "lifestyle",
+  "education",
+  "healthcare",
+  "finance",
+  "entertainment",
+  "travel",
+  "food",
+  "fashion",
+  "sports",
+  "art",
+  "design",
+  "marketing",
+  "real-estate",
+];
 
 function SettingsPanel({ mockupId, glRef }: Props) {
   const [showPanel, setShowPanel] = useState<boolean>(false);
@@ -21,9 +47,99 @@ function SettingsPanel({ mockupId, glRef }: Props) {
   const [publishStatus, setPublishStatus] = useState<
     "idle" | "success" | "error"
   >("idle");
+  const [expandedLayers, setExpandedLayers] = useState<Set<number>>(new Set());
+  const [expandedSections, setExpandedSections] = useState({
+    layers: true,
+    global: false,
+  });
+  const [isLoadingMockup, setIsLoadingMockup] = useState<boolean>(false);
+  const [mockupError, setMockupError] = useState<string | null>(null);
+  const [mockup, setMockup] = useState<Mockup | undefined>();
+  const [selectedCategories, setSelectedCategories] = useState<Set<string>>(
+    new Set()
+  );
+  const [searchTerm, setSearchTerm] = useState<string>("");
+
   const layers = useLayersStore((state) => state.layers);
   const updateLayer = useLayersStore((state) => state.updateLayer);
   const global = useGlobalSettingsStore();
+
+  useEffect(() => {
+    const getMockup = async () => {
+      setIsLoadingMockup(true);
+      try {
+        const mockup = await getMockupById(mockupId);
+        setMockup(mockup);
+
+        // Initialize selected categories from mockup data
+        if (mockup?.categories) {
+          setSelectedCategories(new Set(mockup.categories));
+        }
+
+        setIsLoadingMockup(false);
+        setMockupError(null);
+      } catch (error) {
+        setMockupError(error as string);
+        setIsLoadingMockup(false);
+      }
+    };
+    getMockup();
+  }, [mockupId]);
+
+  const toggleSection = (section: "layers" | "global") => {
+    setExpandedSections((prev) => ({
+      ...prev,
+      [section]: !prev[section],
+    }));
+  };
+
+  const toggleLayer = (layerId: number) => {
+    setExpandedLayers((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(layerId)) {
+        newSet.delete(layerId);
+      } else {
+        newSet.add(layerId);
+      }
+      return newSet;
+    });
+  };
+
+  const toggleCategory = (category: string) => {
+    setSelectedCategories((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(category)) {
+        newSet.delete(category);
+      } else {
+        newSet.add(category);
+      }
+      return newSet;
+    });
+  };
+
+  const addCustomCategory = (category: string) => {
+    const trimmedCategory = category.trim();
+    if (trimmedCategory && !selectedCategories.has(trimmedCategory)) {
+      setSelectedCategories((prev) => new Set(prev).add(trimmedCategory));
+    }
+    setSearchTerm("");
+  };
+
+  const removeCategory = (category: string) => {
+    setSelectedCategories((prev) => {
+      const newSet = new Set(prev);
+      newSet.delete(category);
+      return newSet;
+    });
+  };
+
+  const expandAllLayers = () => {
+    setExpandedLayers(new Set(layers.map((layer) => layer.id)));
+  };
+
+  const collapseAllLayers = () => {
+    setExpandedLayers(new Set());
+  };
 
   const handlePublish = async () => {
     if (!glRef.current) return;
@@ -32,19 +148,14 @@ function SettingsPanel({ mockupId, glRef }: Props) {
     setPublishStatus("idle");
 
     try {
-      // Get the canvas data URL
       const dataUrl = glRef.current.domElement.toDataURL("image/png");
-
-      // Convert data URL to blob
       const response = await fetch(dataUrl);
       const blob = await response.blob();
 
-      // Generate unique filename
       const baseFileName = `${global.name}.png`;
       let fileName = baseFileName;
       let counter = 1;
 
-      // Check if file exists and generate unique name
       const { data: existingFiles } = await supabase.storage
         .from("files")
         .list("thumbnails", {
@@ -58,7 +169,7 @@ function SettingsPanel({ mockupId, glRef }: Props) {
           counter++;
         }
       }
-      // Upload to Supabase storage
+
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from("files")
         .upload(`thumbnails/${fileName}`, blob, {
@@ -66,40 +177,31 @@ function SettingsPanel({ mockupId, glRef }: Props) {
           upsert: true,
         });
 
-      if (uploadError) {
-        throw new Error(`Upload failed: ${uploadError.message}`);
-      }
+      if (uploadError) throw new Error(`Upload failed: ${uploadError.message}`);
 
-      // Get public URL
       const { data: publicUrlData } = supabase.storage
         .from("files")
         .getPublicUrl(`thumbnails/${fileName}`);
 
       const previewUrl = publicUrlData.publicUrl;
 
-      // Update mockups table
       const { error: updateError } = await supabase
         .from("mockups")
         .update({ preview_url: previewUrl })
         .eq("id", mockupId);
 
-      if (updateError) {
-        throw new Error(`Update failed: ${updateError.message}`);
-      }
+      if (updateError) throw new Error(`Update failed: ${updateError.message}`);
 
-      console.log("Successfully uploaded and updated preview URL:", previewUrl);
       setPublishStatus("success");
       setTimeout(() => setPublishStatus("idle"), 2000);
     } catch (error) {
       console.error("Error publishing image:", error);
       setPublishStatus("error");
-      // Handle error (show toast, etc.)
     } finally {
       setIsPublishing(false);
     }
   };
 
-  // Helper to safely get intensity values (fallback to 0 if undefined)
   const getIntensity = (value: number | undefined): number => {
     return typeof value === "number" ? Math.min(Math.max(value, 0), 5) : 0;
   };
@@ -111,10 +213,9 @@ function SettingsPanel({ mockupId, glRef }: Props) {
     setSaveStatus("idle");
 
     try {
-      // Get mockup ID from URL or global state (adjust as needed)
       if (!mockupId) throw new Error("Mockup ID not found");
 
-      // Prepare updates: only include layers that have changed
+      // Save layer settings
       const updates = layers.map((layer) => ({
         layer_id: layer.id,
         noise_threshold: layer.noiseThreshold ?? 0,
@@ -122,12 +223,27 @@ function SettingsPanel({ mockupId, glRef }: Props) {
         shadow_intensity: layer.shadowIntensity ?? 0,
       }));
 
-      const { error } = await supabase.rpc("update_mockup_layers", {
-        p_mockup_id: mockupId,
-        p_updates: updates,
-      });
+      const { error: layersError } = await supabase.rpc(
+        "update_mockup_layers",
+        {
+          p_mockup_id: mockupId,
+          p_updates: updates,
+        }
+      );
 
-      if (error) throw error;
+      if (layersError) throw layersError;
+
+      // Save categories as array
+      const categoriesArray = Array.from(selectedCategories);
+
+      const { error: globalError } = await supabase
+        .from("mockups")
+        .update({
+          categories: categoriesArray,
+        })
+        .eq("id", mockupId);
+
+      if (globalError) throw globalError;
 
       setSaveStatus("success");
       setTimeout(() => setSaveStatus("idle"), 2000);
@@ -139,15 +255,25 @@ function SettingsPanel({ mockupId, glRef }: Props) {
     }
   };
 
+  // Filter categories based on search
+  const filteredCategories = PREDEFINED_CATEGORIES.filter((category) =>
+    category.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const allExpanded = expandedLayers.size === layers.length;
+  const someExpanded =
+    expandedLayers.size > 0 && expandedLayers.size < layers.length;
+  const selectedCategoriesArray = Array.from(selectedCategories);
+
   return (
     <div className="relative">
       <button
         onClick={() => setShowPanel(!showPanel)}
-        className="bg-neutral-700 rounded-md px-5 py-2 uppercase text-sm overflow-hidden cursor-pointer text-white"
+        className="bg-neutral-700 rounded-md px-5 py-2 uppercase text-sm overflow-hidden cursor-pointer text-white hover:bg-neutral-600 transition-colors"
         aria-expanded={showPanel}
         aria-haspopup="dialog"
       >
-        settings
+        Settings
       </button>
 
       <AnimatePresence>
@@ -157,171 +283,508 @@ function SettingsPanel({ mockupId, glRef }: Props) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
             transition={{ duration: 0.2, ease: "easeInOut" }}
-            className="absolute top-16 right-0 bg-white min-h-20 min-w-96 max-w-full p-6 rounded-md shadow-lg border border-neutral-200 z-50"
+            className="absolute top-16 right-0 bg-white min-h-20 w-96 max-w-[90vw] p-6 rounded-md shadow-lg border border-neutral-200 z-50 overflow-y-auto"
             role="dialog"
             aria-modal="true"
             aria-label="Settings panel"
           >
-            <button
-              onClick={() => setShowPanel(false)}
-              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary rounded-full p-1"
-              aria-label="Close settings panel"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                viewBox="0 0 20 20"
-                fill="currentColor"
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold text-gray-800">
+                Settings Panel
+              </h2>
+              <button
+                onClick={() => setShowPanel(false)}
+                className="text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary rounded-full p-1 transition-colors"
+                aria-label="Close settings panel"
               >
-                <path
-                  fillRule="evenodd"
-                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
-
-            <div className="pt-2 space-y-6 max-h-96 overflow-y-auto pr-2">
-              {layers.map((layer) => {
-                const shadow = getIntensity(layer.shadowIntensity);
-                const highlight = getIntensity(layer.highlightsIntensity);
-                const noise = getIntensity(layer.noiseThreshold);
-
-                return (
-                  <div key={layer.id} className="border-b pb-4 last:border-0">
-                    <h3 className="font-medium text-gray-800 mb-3">
-                      Layer {layer.id}
-                    </h3>
-
-                    {/* Shadow Intensity */}
-                    <div className="mb-4">
-                      <div className="flex justify-between text-sm mb-1">
-                        <span className="text-gray-600">Shadow</span>
-                        <span className="font-mono bg-gray-100 px-2 py-0.5 rounded">
-                          {shadow.toFixed(2)}
-                        </span>
-                      </div>
-                      <input
-                        type="range"
-                        min="0"
-                        max="5"
-                        step="0.01"
-                        value={shadow}
-                        onChange={(e) =>
-                          updateLayer(layer.id, {
-                            shadowIntensity: parseFloat(e.target.value),
-                          })
-                        }
-                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
-                        aria-label={`Shadow intensity for layer ${layer.id}`}
-                      />
-                    </div>
-
-                    {/* Highlight Intensity */}
-                    <div className="mb-4">
-                      <div className="flex justify-between text-sm mb-1">
-                        <span className="text-gray-600">Highlight</span>
-                        <span className="font-mono bg-gray-100 px-2 py-0.5 rounded">
-                          {highlight.toFixed(2)}
-                        </span>
-                      </div>
-                      <input
-                        type="range"
-                        min="0"
-                        max="5"
-                        step="0.01"
-                        value={highlight}
-                        onChange={(e) =>
-                          updateLayer(layer.id, {
-                            highlightsIntensity: parseFloat(e.target.value),
-                          })
-                        }
-                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
-                        aria-label={`Highlight intensity for layer ${layer.id}`}
-                      />
-                    </div>
-
-                    {/* Noise threshold */}
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span className="text-gray-600">Noise</span>
-                        <span className="font-mono bg-gray-100 px-2 py-0.5 rounded">
-                          {noise.toFixed(3)}
-                        </span>
-                      </div>
-                      <input
-                        type="range"
-                        min="0"
-                        max="0.1"
-                        step="0.001"
-                        value={noise}
-                        onChange={(e) =>
-                          updateLayer(layer.id, {
-                            noiseThreshold: parseFloat(e.target.value),
-                          })
-                        }
-                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
-                        aria-label={`Noise threshold for layer ${layer.id}`}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </button>
             </div>
 
-            {/* Save Button */}
-            <div className="mt-6 pt-4 border-t border-gray-200 flex justify-center space-x-2">
+            {/* Global Settings Section */}
+            <div className="border border-gray-200 rounded-lg overflow-hidden mb-4">
               <button
-                onClick={handleSave}
-                disabled={isSaving || isPublishing}
-                className="px-4 py-2 bg-primary hover:bg-primary/70 cursor-pointer uppercase text-white rounded-md text-sm font-medium disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2"
+                onClick={() => toggleSection("global")}
+                className="w-full px-4 py-3 bg-gray-50 hover:bg-gray-100 flex items-center justify-between text-left transition-colors"
+                aria-expanded={expandedSections.global}
               >
-                {isSaving ? (
-                  <>
-                    <span className="h-4 w-4 border-t-2 border-r-2 border-white rounded-full animate-spin"></span>
-                    Saving...
-                  </>
-                ) : (
-                  "Save to Cloud"
-                )}
+                <div className="flex items-center gap-3">
+                  <motion.svg
+                    animate={{ rotate: expandedSections.global ? 90 : 0 }}
+                    transition={{ duration: 0.2 }}
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 text-gray-500"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                      clipRule="evenodd"
+                    />
+                  </motion.svg>
+                  <span className="font-medium text-gray-800">
+                    Global Settings
+                  </span>
+                </div>
+                <span className="text-xs text-gray-500 bg-white px-2 py-1 rounded">
+                  {expandedSections.global ? "Expanded" : "Collapsed"}
+                </span>
               </button>
+
+              <AnimatePresence>
+                {expandedSections.global && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="bg-white"
+                  >
+                    <div className="p-4 space-y-4 border-t border-gray-200">
+                      {/* Categories Selection */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-3">
+                          Categories
+                          <span className="text-xs text-gray-500 ml-1">
+                            ({selectedCategories.size} selected)
+                          </span>
+                        </label>
+
+                        {/* Search Input */}
+                        <div className="mb-3">
+                          <input
+                            type="text"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            placeholder="Search categories..."
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                            aria-label="Search categories"
+                          />
+                        </div>
+
+                        {/* Selected Categories */}
+                        {selectedCategories.size > 0 && (
+                          <div className="mb-4">
+                            <div className="flex flex-wrap gap-2 mb-2">
+                              {selectedCategoriesArray.map((category) => (
+                                <span
+                                  key={category}
+                                  className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-full"
+                                >
+                                  {category}
+                                  <button
+                                    onClick={() => removeCategory(category)}
+                                    className="hover:text-primary/70 transition-colors"
+                                    aria-label={`Remove ${category}`}
+                                  >
+                                    <svg
+                                      className="h-3 w-3"
+                                      fill="currentColor"
+                                      viewBox="0 0 20 20"
+                                    >
+                                      <path
+                                        fillRule="evenodd"
+                                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                        clipRule="evenodd"
+                                      />
+                                    </svg>
+                                  </button>
+                                </span>
+                              ))}
+                            </div>
+                            <button
+                              onClick={() => setSelectedCategories(new Set())}
+                              className="text-xs text-red-600 hover:text-red-700 transition-colors"
+                            >
+                              Clear all
+                            </button>
+                          </div>
+                        )}
+
+                        {/* Categories Grid */}
+                        <div className="max-h-48 overflow-y-auto border border-gray-200 rounded-md p-2">
+                          <div className="grid grid-cols-2 gap-2">
+                            {filteredCategories.map((category) => (
+                              <label
+                                key={category}
+                                className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded cursor-pointer transition-colors"
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={selectedCategories.has(category)}
+                                  onChange={() => toggleCategory(category)}
+                                  className="rounded border-gray-300 text-primary focus:ring-primary"
+                                  aria-label={`Select ${category} category`}
+                                />
+                                <span className="text-sm text-gray-700 capitalize">
+                                  {category}
+                                </span>
+                              </label>
+                            ))}
+
+                            {filteredCategories.length === 0 && searchTerm && (
+                              <div className="col-span-2 text-center py-4">
+                                <p className="text-sm text-gray-500 mb-2">
+                                  No categories found
+                                </p>
+                                <button
+                                  onClick={() => addCustomCategory(searchTerm)}
+                                  className="text-xs bg-primary text-white px-3 py-1 rounded hover:bg-primary/90 transition-colors"
+                                >
+                                  Add "{searchTerm}" as custom category
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Custom Category Input */}
+                        <div className="mt-3 flex gap-2">
+                          <input
+                            type="text"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            placeholder="Or add custom category..."
+                            className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                            aria-label="Add custom category"
+                          />
+                          <button
+                            onClick={() => addCustomCategory(searchTerm)}
+                            disabled={!searchTerm.trim()}
+                            className="px-3 py-2 bg-gray-600 text-white text-sm rounded-md hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                          >
+                            Add
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Layers Settings Section - Rest of the code remains the same */}
+            <div className="border border-gray-200 rounded-lg overflow-hidden">
               <button
-                onClick={handlePublish}
-                disabled={isPublishing || isSaving}
-                className="px-4 py-2 bg-primary hover:bg-primary/70 cursor-pointer uppercase text-white rounded-md text-sm font-medium disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2"
+                onClick={() => toggleSection("layers")}
+                className="w-full px-4 py-3 bg-gray-50 hover:bg-gray-100 flex items-center justify-between text-left transition-colors"
+                aria-expanded={expandedSections.layers}
               >
-                {isPublishing ? (
-                  <>
-                    <span className="h-4 w-4 border-t-2 border-r-2 border-white rounded-full animate-spin"></span>
-                    Publishing...
-                  </>
-                ) : (
-                  "Publish Preview"
-                )}
+                <div className="flex items-center gap-3">
+                  <motion.svg
+                    animate={{ rotate: expandedSections.layers ? 90 : 0 }}
+                    transition={{ duration: 0.2 }}
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 text-gray-500"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                      clipRule="evenodd"
+                    />
+                  </motion.svg>
+                  <span className="font-medium text-gray-800">
+                    Layer Settings
+                  </span>
+                </div>
+                <span className="text-xs text-gray-500 bg-white px-2 py-1 rounded">
+                  {expandedSections.layers ? "Expanded" : "Collapsed"}
+                </span>
               </button>
+
+              <AnimatePresence>
+                {expandedSections.layers && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="bg-white"
+                  >
+                    <div className="p-4 border-t border-gray-200">
+                      <div className="flex justify-between items-center mb-4">
+                        <span className="text-sm text-gray-600">
+                          {layers.length} layer{layers.length !== 1 ? "s" : ""}
+                        </span>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={expandAllLayers}
+                            disabled={allExpanded}
+                            className="text-xs px-2 py-1 text-gray-600 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                          >
+                            Expand All
+                          </button>
+                          <button
+                            onClick={collapseAllLayers}
+                            disabled={!someExpanded && !allExpanded}
+                            className="text-xs px-2 py-1 text-gray-600 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                          >
+                            Collapse All
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
+                        {layers.map((layer) => {
+                          const isExpanded = expandedLayers.has(layer.id);
+                          const shadow = getIntensity(layer.shadowIntensity);
+                          const highlight = getIntensity(
+                            layer.highlightsIntensity
+                          );
+                          const noise = getIntensity(layer.noiseThreshold);
+
+                          return (
+                            <div
+                              key={layer.id}
+                              className="border border-gray-200 rounded-lg overflow-hidden"
+                            >
+                              <button
+                                onClick={() => toggleLayer(layer.id)}
+                                className="w-full px-4 py-3 bg-gray-50 hover:bg-gray-100 flex items-center justify-between text-left transition-colors"
+                                aria-expanded={isExpanded}
+                              >
+                                <div className="flex items-center gap-3">
+                                  <motion.svg
+                                    animate={{ rotate: isExpanded ? 90 : 0 }}
+                                    transition={{ duration: 0.2 }}
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-4 w-4 text-gray-500"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                  >
+                                    <path
+                                      fillRule="evenodd"
+                                      d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                                      clipRule="evenodd"
+                                    />
+                                  </motion.svg>
+                                  <span className="font-medium text-gray-800">
+                                    Layer {layer.id}
+                                  </span>
+                                </div>
+                                <span className="text-xs text-gray-500 bg-white px-2 py-1 rounded">
+                                  {isExpanded ? "Expanded" : "Collapsed"}
+                                </span>
+                              </button>
+
+                              <AnimatePresence>
+                                {isExpanded && (
+                                  <motion.div
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: "auto" }}
+                                    exit={{ opacity: 0, height: 0 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="bg-white"
+                                  >
+                                    <div className="p-4 space-y-4 border-t border-gray-200">
+                                      {/* Layer settings inputs remain the same */}
+                                      <div>
+                                        <div className="flex justify-between text-sm mb-2">
+                                          <span className="text-gray-600 font-medium">
+                                            Shadow Intensity
+                                          </span>
+                                          <span className="font-mono bg-gray-100 px-2 py-0.5 rounded text-xs">
+                                            {shadow.toFixed(2)}
+                                          </span>
+                                        </div>
+                                        <input
+                                          type="range"
+                                          min="0"
+                                          max="5"
+                                          step="0.01"
+                                          value={shadow}
+                                          onChange={(e) =>
+                                            updateLayer(layer.id, {
+                                              shadowIntensity: parseFloat(
+                                                e.target.value
+                                              ),
+                                            })
+                                          }
+                                          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                                        />
+                                      </div>
+
+                                      <div>
+                                        <div className="flex justify-between text-sm mb-2">
+                                          <span className="text-gray-600 font-medium">
+                                            Highlight Intensity
+                                          </span>
+                                          <span className="font-mono bg-gray-100 px-2 py-0.5 rounded text-xs">
+                                            {highlight.toFixed(2)}
+                                          </span>
+                                        </div>
+                                        <input
+                                          type="range"
+                                          min="0"
+                                          max="5"
+                                          step="0.01"
+                                          value={highlight}
+                                          onChange={(e) =>
+                                            updateLayer(layer.id, {
+                                              highlightsIntensity: parseFloat(
+                                                e.target.value
+                                              ),
+                                            })
+                                          }
+                                          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                                        />
+                                      </div>
+
+                                      <div>
+                                        <div className="flex justify-between text-sm mb-2">
+                                          <span className="text-gray-600 font-medium">
+                                            Noise Threshold
+                                          </span>
+                                          <span className="font-mono bg-gray-100 px-2 py-0.5 rounded text-xs">
+                                            {noise.toFixed(3)}
+                                          </span>
+                                        </div>
+                                        <input
+                                          type="range"
+                                          min="0"
+                                          max="0.1"
+                                          step="0.001"
+                                          value={noise}
+                                          onChange={(e) =>
+                                            updateLayer(layer.id, {
+                                              noiseThreshold: parseFloat(
+                                                e.target.value
+                                              ),
+                                            })
+                                          }
+                                          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                                        />
+                                      </div>
+                                    </div>
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="mt-6 pt-4 border-t border-gray-200">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  onClick={handleSave}
+                  disabled={isSaving || isPublishing}
+                  className="flex-1 px-4 py-2.5 bg-primary hover:bg-primary/90 cursor-pointer uppercase text-white rounded-md text-sm font-medium disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
+                >
+                  {isSaving ? (
+                    <>
+                      <span className="h-4 w-4 border-t-2 border-r-2 border-white rounded-full animate-spin"></span>
+                      Saving...
+                    </>
+                  ) : (
+                    "Save to Cloud"
+                  )}
+                </button>
+                <button
+                  onClick={handlePublish}
+                  disabled={isPublishing || isSaving}
+                  className="flex-1 px-4 py-2.5 bg-green-600 hover:bg-green-700 cursor-pointer uppercase text-white rounded-md text-sm font-medium disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
+                >
+                  {isPublishing ? (
+                    <>
+                      <span className="h-4 w-4 border-t-2 border-r-2 border-white rounded-full animate-spin"></span>
+                      Publishing...
+                    </>
+                  ) : (
+                    "Publish Preview"
+                  )}
+                </button>
+              </div>
             </div>
 
             {/* Status Feedback */}
-            {saveStatus === "success" && (
-              <div className="mt-2 text-green-600 text-sm text-center">
-                ✅ Settings saved!
-              </div>
-            )}
-            {saveStatus === "error" && (
-              <div className="mt-2 text-red-600 text-sm text-center">
-                ❌ Failed to save settings. Please try again.
-              </div>
-            )}
-            {publishStatus === "success" && (
-              <div className="mt-2 text-green-600 text-sm text-center">
-                ✅ Preview saved!
-              </div>
-            )}
-            {publishStatus === "error" && (
-              <div className="mt-2 text-red-600 text-sm text-center">
-                ❌ Failed to save preview. Please try again.
-              </div>
-            )}
+            <div className="mt-3 min-h-[20px]">
+              {saveStatus === "success" && (
+                <div className="text-green-600 text-sm text-center flex items-center justify-center gap-2">
+                  <svg
+                    className="h-4 w-4"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  Settings saved successfully!
+                </div>
+              )}
+              {saveStatus === "error" && (
+                <div className="text-red-600 text-sm text-center flex items-center justify-center gap-2">
+                  <svg
+                    className="h-4 w-4"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  Failed to save settings
+                </div>
+              )}
+              {publishStatus === "success" && (
+                <div className="text-green-600 text-sm text-center flex items-center justify-center gap-2">
+                  <svg
+                    className="h-4 w-4"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  Preview published successfully!
+                </div>
+              )}
+              {publishStatus === "error" && (
+                <div className="text-red-600 text-sm text-center flex items-center justify-center gap-2">
+                  <svg
+                    className="h-4 w-4"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  Failed to publish preview
+                </div>
+              )}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

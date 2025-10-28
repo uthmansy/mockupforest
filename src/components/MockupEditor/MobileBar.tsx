@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useMemo } from "react";
 import FileUpload from "./FileUpload";
 import Picker from "./Picker";
 import { SidebarLayer, useSidebarStore } from "@/app/stores/useSidebarStore";
@@ -9,63 +9,80 @@ import { MdImage } from "react-icons/md";
 
 function MobileBar() {
   const layers = useSidebarStore((state) => state.sidebarLayers);
-  const [currentLayerId, setCurrentLayerId] = useState<number>(1);
-  const [currentLayer, setCurrentLayer] = useState<SidebarLayer | null>(null);
+  const [currentLayerId, setCurrentLayerId] = React.useState<number>(1);
 
-  useEffect(() => {
-    setCurrentLayer(layers.filter((l) => l.id === currentLayerId)[0]);
-  }, [currentLayerId, layers]);
+  // Use useMemo to efficiently find the current layer
+  const currentLayer = useMemo(
+    () => layers.find((layer) => layer.id === currentLayerId) || null,
+    [currentLayerId, layers]
+  );
+
+  // Handler for tab navigation
+  const handleTabClick = (layerId: number) => {
+    setCurrentLayerId(layerId);
+  };
+
+  // Icon configuration to avoid conditional rendering in JSX
+  const layerIcons = {
+    color: IoColorFilter,
+    design: MdImage,
+  };
 
   return (
-    <>
-      <div className="min-h-max text-white fixed bottom-24 right-0 left-0 z-10 bg-inherit">
-        {layers.map((layer) => {
-          return layer.type === "design" ? (
-            <div
-              key={layer.id}
-              className={`${
-                layer.id === currentLayerId
-                  ? "visible relative"
-                  : "invisible absolute"
-              }`}
-            >
+    <div className="mobile-bar">
+      {/* Content Area */}
+      <div className="mobile-bar__content">
+        {layers.map((layer) => (
+          <div
+            key={layer.id}
+            className={`mobile-bar__panel ${
+              layer.id === currentLayerId
+                ? "mobile-bar__panel--active"
+                : "mobile-bar__panel--inactive"
+            }`}
+            role="tabpanel"
+            aria-hidden={layer.id !== currentLayerId}
+          >
+            {layer.type === "design" ? (
               <FileUpload layerId={layer.id} label="Your Design" />
-            </div>
-          ) : (
-            <div
-              key={layer.id}
-              className={`${
-                layer.id === currentLayerId
-                  ? "visible relative"
-                  : "invisible absolute"
-              }`}
-            >
+            ) : (
               <Picker layerId={layer.id} />
-            </div>
-          );
-        })}
+            )}
+          </div>
+        ))}
       </div>
-      <div className="h-24 border-white/40 border-t flex items-center justify-center space-x-8 text-white">
+
+      {/* Tab Navigation */}
+      <nav className="mobile-bar__navigation" role="tablist">
         {layers.map((layer) => {
+          const IconComponent = layerIcons[layer.type];
+          const isActive = layer.id === currentLayerId;
+
           return (
-            <div key={layer.id} onClick={() => setCurrentLayerId(layer.id)}>
-              <h5
-                className={`uppercase  flex flex-col items-center space-y-2 ${
-                  layer.id === currentLayerId ? "text-white" : "text-white/50"
-                }`}
-              >
-                {layer.type === "color" ? (
-                  <IoColorFilter className="text-2xl" />
-                ) : (
-                  <MdImage className="text-2xl" />
-                )}
-                <span className="flex-1 truncate text-xs">{layer.name}</span>
-              </h5>
-            </div>
+            <button
+              key={layer.id}
+              className={`mobile-bar__tab ${
+                isActive
+                  ? "mobile-bar__tab--active"
+                  : "mobile-bar__tab--inactive"
+              }`}
+              onClick={() => handleTabClick(layer.id)}
+              role="tab"
+              aria-selected={isActive}
+              aria-controls={`panel-${layer.id}`}
+            >
+              <span className="mobile-bar__tab-content">
+                <IconComponent
+                  className="mobile-bar__tab-icon"
+                  aria-hidden="true"
+                />
+                <span className="mobile-bar__tab-label">{layer.name}</span>
+              </span>
+            </button>
           );
         })}
-      </div>
-    </>
+      </nav>
+    </div>
   );
 }
 

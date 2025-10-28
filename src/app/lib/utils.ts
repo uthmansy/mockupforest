@@ -1,3 +1,6 @@
+import { supabase } from "@/lib/supabaseClient";
+import { Mockup } from "@/types/db";
+
 // Solves H such that H * [x, y, 1]^T = [u, v, w]^T → (u/w, v/w) = destination
 export function computeHomography(
   srcPts: [number, number][], // e.g., [[0,0], [1,0], [1,1], [0,1]]
@@ -73,3 +76,18 @@ function solveLinearSystem(A: number[][], b: number[]): number[] {
   }
   return x;
 }
+
+export const getMockupById = async (id: string): Promise<Mockup> => {
+  const { data, error } = await supabase
+    .from("mockups")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error) {
+    console.error("Error fetching related mockups:", error.message);
+    throw new Error(error.message);
+  }
+
+  return data ?? null;
+};
