@@ -1,5 +1,6 @@
 "use client";
 
+import { useGlobalSettingsStore } from "@/app/stores/useGlobalSettingsStore";
 import { useLoader } from "@react-three/fiber";
 import * as THREE from "three";
 
@@ -17,6 +18,8 @@ const BaseLayer = ({ height, width, src }: Props) => {
   texture.generateMipmaps = true;
   texture.colorSpace = THREE.SRGBColorSpace;
 
+  // const global = useGlobalSettingsStore();
+  // const baseTexture = global.baseTexture;
   return (
     <mesh position={[0, 0, 0]}>
       <planeGeometry args={[width, height]} />
