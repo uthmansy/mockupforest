@@ -55,6 +55,7 @@ export default function GalleryGrid({ mockups }: GalleryGridProps) {
                 className="object-cover transition-transform duration-300 scale-110 group-hover:scale-125"
                 quality={80}
                 priority={false}
+                unoptimized
               />
             </div>
             <div className="px-3 py-5">
