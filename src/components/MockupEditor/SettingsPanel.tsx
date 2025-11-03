@@ -15,26 +15,12 @@ interface Props {
 
 // Predefined categories list
 const PREDEFINED_CATEGORIES = [
-  "business",
-  "modern",
-  "minimal",
-  "creative",
-  "elegant",
-  "professional",
-  "technology",
-  "lifestyle",
-  "education",
-  "healthcare",
-  "finance",
-  "entertainment",
-  "travel",
-  "food",
-  "fashion",
-  "sports",
-  "art",
-  "design",
-  "marketing",
-  "real-estate",
+  "devices",
+  "posters",
+  "packaging",
+  "branding",
+  "cosmetics",
+  "stationery",
 ];
 
 function SettingsPanel({ mockupId, glRef }: Props) {
