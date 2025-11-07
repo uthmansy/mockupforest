@@ -85,10 +85,8 @@ export default function MockupEditor({ mockupData }: Props) {
 
         return {
           ...layer,
-          mask: `https://mzjwyiqfusnwbzhtelvh.supabase.co/storage/v1/object/public/files/online-mockups/${data.global?.name}/${layer.mask}`,
-          design: layer.design
-            ? `https://mzjwyiqfusnwbzhtelvh.supabase.co/storage/v1/object/public/files/online-mockups/${data.global?.name}/${layer.design}`
-            : null,
+          mask: `${mockupData?.source_url}/${layer.mask}`,
+          design: `${mockupData?.source_url}/${layer.design}`,
           width: layer.width * 0.5,
           height: layer.height * 0.5,
           // crop,
@@ -101,8 +99,8 @@ export default function MockupEditor({ mockupData }: Props) {
     setGroups(data.groups);
     updateGlobal({
       ...data.global,
-      uv: `https://mzjwyiqfusnwbzhtelvh.supabase.co/storage/v1/object/public/files/online-mockups/${data.global?.name}/${data.global?.uv}`,
-      base: `https://mzjwyiqfusnwbzhtelvh.supabase.co/storage/v1/object/public/files/online-mockups/${data.global?.name}/${data.global?.base}`,
+      uv: `${mockupData?.source_url}/${data.global?.uv}`,
+      base: `${mockupData?.source_url}/${data.global?.base}`,
     });
     syncWithLayers(data.layers);
     setIsLoading(false);

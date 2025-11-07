@@ -19,6 +19,7 @@ const nextConfig: NextConfig = {
       "cdn.pixabay.com",
       "plus.unsplash.com",
       "mzjwyiqfusnwbzhtelvh.supabase.co",
+      "files.mockupforest.com",
     ],
   },
 };

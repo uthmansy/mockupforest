@@ -140,7 +140,7 @@ function SettingsPanel({ mockupId, glRef }: Props) {
       const originalHeight = canvas.height;
 
       // 2️⃣ Create an offscreen canvas for resizing/compression
-      const maxSize = 1200;
+      const maxSize = 2000;
       let targetWidth = originalWidth;
       let targetHeight = originalHeight;
 
@@ -160,7 +160,7 @@ function SettingsPanel({ mockupId, glRef }: Props) {
       ctx?.drawImage(canvas, 0, 0, targetWidth, targetHeight);
 
       // 3️⃣ Convert to JPEG with compression (quality 0.75 = good balance)
-      const dataUrl = offscreen.toDataURL("image/jpeg", 0.75);
+      const dataUrl = offscreen.toDataURL("image/jpeg", 0.9);
 
       // 4️⃣ Convert Data URL to Blob
       const response = await fetch(dataUrl);

@@ -9,7 +9,7 @@ import { useGlobalSettingsStore } from "@/app/stores/useGlobalSettingsStore";
 
 interface DesignLayerProps {
   mask: string;
-  design: string | null;
+  design: string;
   width: number;
   height: number;
   zIndex: number;
@@ -111,6 +111,7 @@ export const DesignLayer: React.FC<DesignLayerProps> = ({
     let canceled = false;
 
     const textureLoader = new THREE.TextureLoader();
+    textureLoader.setCrossOrigin("anonymous");
 
     const loadTexture = (url: string, srgb = true) =>
       new Promise<THREE.Texture>((resolve, reject) => {
@@ -143,8 +144,8 @@ export const DesignLayer: React.FC<DesignLayerProps> = ({
         );
       });
 
-    Promise.all([loadTexture(design), loadTexture(mask)])
-      .then(([designTex, maskTex]) => {
+    Promise.all([loadTexture(mask), loadTexture(design)])
+      .then(([maskTex, designTex]) => {
         if (!canceled) {
           setDesignTexture(designTex);
           setMaskTexture(maskTex);

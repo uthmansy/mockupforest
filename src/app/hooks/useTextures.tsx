@@ -66,6 +66,7 @@ export const useTextures = ({ uv, base, design, mask }: UseTexturesProps) => {
         const loader = options?.exr
           ? exrLoaderRef.current
           : textureLoaderRef.current;
+        // loader && (loader.crossOrigin = "anonymous");
 
         if (!loader) return reject("No loader available");
 

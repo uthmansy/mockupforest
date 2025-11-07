@@ -12,7 +12,7 @@ export interface Layer {
   name: string;
   height: number;
   width: number;
-  design?: string | null;
+  design: string;
   uvPass?: string;
   mask: string;
   zIndex: number;
