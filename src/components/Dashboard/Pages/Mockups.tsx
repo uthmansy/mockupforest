@@ -144,11 +144,95 @@ function Mockups() {
   };
 
   // Action handlers (same as before, but with refetch after actions)
+  // const handleDelete = async (mockupId: string) => {
+  //   try {
+  //     setActionLoading(mockupId);
+
+  //     // First, get the mockup data to access slug and preview_url
+  //     const { data: mockupData, error: fetchError } = await supabase
+  //       .from("mockups")
+  //       .select("slug, preview_url")
+  //       .eq("id", mockupId)
+  //       .single();
+
+  //     if (fetchError) throw fetchError;
+
+  //     // Delete files from Supabase Storage
+  //     const storageDeletions = [];
+
+  //     // 1. Delete thumbnail if preview_url exists
+  //     if (mockupData.preview_url) {
+  //       // Extract the file path from the preview_url
+  //       // URL format: https://[project].supabase.co/storage/v1/object/public/files/thumbnails/filename.jpg
+  //       const urlParts = mockupData.preview_url.split("/");
+  //       const fileName = urlParts[urlParts.length - 1];
+  //       const thumbnailPath = `thumbnails/${fileName}`;
+
+  //       storageDeletions.push(
+  //         supabase.storage.from("files").remove([thumbnailPath])
+  //       );
+  //     }
+
+  //     // 2. Delete the entire folder in online-mockups with the slug name
+  //     if (mockupData.slug) {
+  //       // List all files in the folder first
+  //       const { data: folderFiles, error: listError } = await supabase.storage
+  //         .from("files")
+  //         .list(`online-mockups/${mockupData.slug}`);
+
+  //       if (!listError && folderFiles && folderFiles.length > 0) {
+  //         // Create an array of all file paths to delete
+  //         const filesToDelete = folderFiles.map(
+  //           (file) => `online-mockups/${mockupData.slug}/${file.name}`
+  //         );
+
+  //         storageDeletions.push(
+  //           supabase.storage.from("files").remove(filesToDelete)
+  //         );
+  //       }
+  //     }
+
+  //     // Wait for all storage deletions to complete
+  //     if (storageDeletions.length > 0) {
+  //       const storageResults = await Promise.allSettled(storageDeletions);
+
+  //       // Check if any storage deletions failed
+  //       const storageErrors = storageResults.filter(
+  //         (result) =>
+  //           result.status === "rejected" ||
+  //           (result.status === "fulfilled" && result.value.error)
+  //       );
+
+  //       if (storageErrors.length > 0) {
+  //         console.warn("Some storage deletions failed:", storageErrors);
+  //         // Continue with database deletion even if storage deletion fails
+  //       }
+  //     }
+
+  //     // Finally, delete the database record
+  //     const { error: deleteError } = await supabase
+  //       .from("mockups")
+  //       .delete()
+  //       .eq("id", mockupId);
+
+  //     if (deleteError) throw deleteError;
+
+  //     // Refetch to update the list and pagination
+  //     await fetchMockups(currentPage, searchTerm, selectedCategory);
+  //     setShowDeleteModal(false);
+  //     setSelectedMockup(null);
+  //   } catch (error) {
+  //     console.error("Error deleting mockup:", error);
+  //   } finally {
+  //     setActionLoading(null);
+  //   }
+  // };
+
   const handleDelete = async (mockupId: string) => {
     try {
       setActionLoading(mockupId);
 
-      // First, get the mockup data to access slug and preview_url
+      // 1️⃣ Fetch mockup data
       const { data: mockupData, error: fetchError } = await supabase
         .from("mockups")
         .select("slug, preview_url")
@@ -157,59 +241,75 @@ function Mockups() {
 
       if (fetchError) throw fetchError;
 
-      // Delete files from Supabase Storage
-      const storageDeletions = [];
+      const storageDeletions: Promise<any>[] = [];
 
-      // 1. Delete thumbnail if preview_url exists
-      if (mockupData.preview_url) {
-        // Extract the file path from the preview_url
-        // URL format: https://[project].supabase.co/storage/v1/object/public/files/thumbnails/filename.jpg
-        const urlParts = mockupData.preview_url.split("/");
-        const fileName = urlParts[urlParts.length - 1];
-        const thumbnailPath = `thumbnails/${fileName}`;
+      // 2️⃣ Delete from Cloudflare R2 (preview + folder)
+      if (mockupData.preview_url || mockupData.slug) {
+        try {
+          const payload: any = {};
 
-        storageDeletions.push(
-          supabase.storage.from("files").remove([thumbnailPath])
-        );
+          // Single preview file
+          if (mockupData.preview_url) {
+            const fileName = mockupData.preview_url.split("/").pop();
+            if (fileName) payload.file = `thumbnails/${fileName}`;
+          }
+
+          // Entire folder
+          if (mockupData.slug) {
+            payload.folder = `online-mockups/${mockupData.slug}`;
+          }
+
+          storageDeletions.push(
+            fetch("https://delete-file.serve-image.workers.dev", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            })
+          );
+        } catch (err) {
+          console.warn("Failed to delete from Cloudflare R2:", err);
+        }
       }
 
-      // 2. Delete the entire folder in online-mockups with the slug name
+      // 3️⃣ Delete preview from Supabase if exists there
+      if (mockupData.preview_url?.includes("supabase.co")) {
+        const fileName = mockupData.preview_url.split("/").pop();
+        if (fileName) {
+          storageDeletions.push(
+            supabase.storage.from("files").remove([`thumbnails/${fileName}`])
+          );
+        }
+      }
+
+      // 4️⃣ Delete folder in Supabase Storage (`online-mockups/<slug>`)
       if (mockupData.slug) {
-        // List all files in the folder first
         const { data: folderFiles, error: listError } = await supabase.storage
           .from("files")
           .list(`online-mockups/${mockupData.slug}`);
 
         if (!listError && folderFiles && folderFiles.length > 0) {
-          // Create an array of all file paths to delete
           const filesToDelete = folderFiles.map(
             (file) => `online-mockups/${mockupData.slug}/${file.name}`
           );
-
           storageDeletions.push(
             supabase.storage.from("files").remove(filesToDelete)
           );
         }
       }
 
-      // Wait for all storage deletions to complete
+      // 5️⃣ Wait for all deletions
       if (storageDeletions.length > 0) {
-        const storageResults = await Promise.allSettled(storageDeletions);
-
-        // Check if any storage deletions failed
-        const storageErrors = storageResults.filter(
-          (result) =>
-            result.status === "rejected" ||
-            (result.status === "fulfilled" && result.value.error)
+        const results = await Promise.allSettled(storageDeletions);
+        const errors = results.filter(
+          (r) =>
+            r.status === "rejected" ||
+            (r.status === "fulfilled" && r.value?.error)
         );
-
-        if (storageErrors.length > 0) {
-          console.warn("Some storage deletions failed:", storageErrors);
-          // Continue with database deletion even if storage deletion fails
-        }
+        if (errors.length > 0)
+          console.warn("Some storage deletions failed:", errors);
       }
 
-      // Finally, delete the database record
+      // 6️⃣ Delete database record
       const { error: deleteError } = await supabase
         .from("mockups")
         .delete()
@@ -217,7 +317,7 @@ function Mockups() {
 
       if (deleteError) throw deleteError;
 
-      // Refetch to update the list and pagination
+      // 7️⃣ Refresh UI
       await fetchMockups(currentPage, searchTerm, selectedCategory);
       setShowDeleteModal(false);
       setSelectedMockup(null);

@@ -127,6 +127,99 @@ function SettingsPanel({ mockupId, glRef }: Props) {
     setExpandedLayers(new Set());
   };
 
+  // const handlePublish = async () => {
+  //   if (!glRef.current) return;
+
+  //   setIsPublishing(true);
+  //   setPublishStatus("idle");
+
+  //   try {
+  //     // 1️⃣ Capture the image from WebGL canvas
+  //     const canvas = glRef.current.domElement;
+  //     const originalWidth = canvas.width;
+  //     const originalHeight = canvas.height;
+
+  //     // 2️⃣ Create an offscreen canvas for resizing/compression
+  //     const maxSize = 2000;
+  //     let targetWidth = originalWidth;
+  //     let targetHeight = originalHeight;
+
+  //     if (originalWidth > originalHeight && originalWidth > maxSize) {
+  //       targetWidth = maxSize;
+  //       targetHeight = Math.round((originalHeight * maxSize) / originalWidth);
+  //     } else if (originalHeight > maxSize) {
+  //       targetHeight = maxSize;
+  //       targetWidth = Math.round((originalWidth * maxSize) / originalHeight);
+  //     }
+
+  //     const offscreen = document.createElement("canvas");
+  //     offscreen.width = targetWidth;
+  //     offscreen.height = targetHeight;
+
+  //     const ctx = offscreen.getContext("2d");
+  //     ctx?.drawImage(canvas, 0, 0, targetWidth, targetHeight);
+
+  //     // 3️⃣ Convert to JPEG with compression (quality 0.75 = good balance)
+  //     const dataUrl = offscreen.toDataURL("image/jpeg", 0.9);
+
+  //     // 4️⃣ Convert Data URL to Blob
+  //     const response = await fetch(dataUrl);
+  //     const blob = await response.blob();
+
+  //     // 5️⃣ Generate a unique filename
+  //     const baseFileName = `${global.name}.jpg`;
+  //     let fileName = baseFileName;
+  //     let counter = 1;
+
+  //     const { data: existingFiles } = await supabase.storage
+  //       .from("files")
+  //       .list("thumbnails", {
+  //         search: baseFileName.replace(".jpg", ""),
+  //       });
+
+  //     if (existingFiles && existingFiles.length > 0) {
+  //       const existingNames = existingFiles.map((file) => file.name);
+  //       while (existingNames.includes(fileName)) {
+  //         fileName = `${global.name}_${counter}.jpg`;
+  //         counter++;
+  //       }
+  //     }
+
+  //     // 6️⃣ Upload compressed JPG
+  //     const { data: uploadData, error: uploadError } = await supabase.storage
+  //       .from("files")
+  //       .upload(`thumbnails/${fileName}`, blob, {
+  //         contentType: "image/jpeg",
+  //         upsert: true,
+  //       });
+
+  //     if (uploadError) throw new Error(`Upload failed: ${uploadError.message}`);
+
+  //     // 7️⃣ Get the public URL
+  //     const { data: publicUrlData } = supabase.storage
+  //       .from("files")
+  //       .getPublicUrl(`thumbnails/${fileName}`);
+
+  //     const previewUrl = publicUrlData.publicUrl;
+
+  //     // 8️⃣ Update mockup record
+  //     const { error: updateError } = await supabase
+  //       .from("mockups")
+  //       .update({ preview_url: previewUrl })
+  //       .eq("id", mockupId);
+
+  //     if (updateError) throw new Error(`Update failed: ${updateError.message}`);
+
+  //     setPublishStatus("success");
+  //     setTimeout(() => setPublishStatus("idle"), 2000);
+  //   } catch (error) {
+  //     console.error("Error publishing image:", error);
+  //     setPublishStatus("error");
+  //   } finally {
+  //     setIsPublishing(false);
+  //   }
+  // };
+
   const handlePublish = async () => {
     if (!glRef.current) return;
 
@@ -134,7 +227,7 @@ function SettingsPanel({ mockupId, glRef }: Props) {
     setPublishStatus("idle");
 
     try {
-      // 1️⃣ Capture the image from WebGL canvas
+      // 1️⃣ Capture image from WebGL canvas
       const canvas = glRef.current.domElement;
       const originalWidth = canvas.width;
       const originalHeight = canvas.height;
@@ -159,50 +252,40 @@ function SettingsPanel({ mockupId, glRef }: Props) {
       const ctx = offscreen.getContext("2d");
       ctx?.drawImage(canvas, 0, 0, targetWidth, targetHeight);
 
-      // 3️⃣ Convert to JPEG with compression (quality 0.75 = good balance)
-      const dataUrl = offscreen.toDataURL("image/jpeg", 0.9);
+      // 3️⃣ Convert to JPEG with compression (quality 0.9)
+      const dataUrl = offscreen.toDataURL("image/jpeg", 0.98);
 
-      // 4️⃣ Convert Data URL to Blob
+      // 4️⃣ Convert Data URL → Blob
       const response = await fetch(dataUrl);
       const blob = await response.blob();
 
       // 5️⃣ Generate a unique filename
-      const baseFileName = `${global.name}.jpg`;
-      let fileName = baseFileName;
-      let counter = 1;
+      const timeStamp = Date.now();
+      const safeName =
+        global.name?.replace(/\s+/g, "_").toLowerCase() || "mockup";
+      const fileName = `${safeName}_${timeStamp}.jpg`;
 
-      const { data: existingFiles } = await supabase.storage
-        .from("files")
-        .list("thumbnails", {
-          search: baseFileName.replace(".jpg", ""),
-        });
+      // 6️⃣ Upload compressed JPG to Cloudflare R2 via Worker
+      const uploadUrl = `https://upload-thumbnail.serve-image.workers.dev?file=${encodeURIComponent(
+        fileName
+      )}`;
 
-      if (existingFiles && existingFiles.length > 0) {
-        const existingNames = existingFiles.map((file) => file.name);
-        while (existingNames.includes(fileName)) {
-          fileName = `${global.name}_${counter}.jpg`;
-          counter++;
-        }
+      const uploadResponse = await fetch(uploadUrl, {
+        method: "POST",
+        body: blob,
+        headers: {
+          "Content-Type": "image/jpeg",
+        },
+      });
+
+      if (!uploadResponse.ok) {
+        const text = await uploadResponse.text();
+        throw new Error(`Upload failed: ${text}`);
       }
 
-      // 6️⃣ Upload compressed JPG
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from("files")
-        .upload(`thumbnails/${fileName}`, blob, {
-          contentType: "image/jpeg",
-          upsert: true,
-        });
+      const { url: previewUrl } = await uploadResponse.json();
 
-      if (uploadError) throw new Error(`Upload failed: ${uploadError.message}`);
-
-      // 7️⃣ Get the public URL
-      const { data: publicUrlData } = supabase.storage
-        .from("files")
-        .getPublicUrl(`thumbnails/${fileName}`);
-
-      const previewUrl = publicUrlData.publicUrl;
-
-      // 8️⃣ Update mockup record
+      // 7️⃣ Update mockup record in Supabase
       const { error: updateError } = await supabase
         .from("mockups")
         .update({ preview_url: previewUrl })
@@ -210,6 +293,7 @@ function SettingsPanel({ mockupId, glRef }: Props) {
 
       if (updateError) throw new Error(`Update failed: ${updateError.message}`);
 
+      // ✅ Success UI feedback
       setPublishStatus("success");
       setTimeout(() => setPublishStatus("idle"), 2000);
     } catch (error) {

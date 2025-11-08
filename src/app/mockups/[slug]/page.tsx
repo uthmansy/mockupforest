@@ -87,6 +87,7 @@ export default async function MockupDetailPage({ params }: Props) {
                   sizes="(max-width: 768px) 100vw, 800px"
                   className="object-cover"
                   priority
+                  unoptimized
                 />
               </div>
 
