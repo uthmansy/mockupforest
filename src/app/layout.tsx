@@ -40,6 +40,13 @@ export default function RootLayout({
           src="https://www.googletagmanager.com/gtag/js?id=G-FV21ZFQTVF"
           strategy="afterInteractive"
         />
+        <Script
+          id="adsense-script"
+          async
+          strategy="afterInteractive"
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7110287889370422"
+          crossOrigin="anonymous"
+        />
         <Script id="google-analytics" strategy="afterInteractive">
           {`
             window.dataLayer = window.dataLayer || [];
