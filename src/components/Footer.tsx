@@ -20,11 +20,11 @@ export default function Footer() {
               className="mb-5"
             />
             <p className="text-white/50 text-sm">
-              Your go-to source for high-quality PSD mockups. Elevate your
-              design projects with professional assets.
+              Your go-to source for high-quality mockups. Elevate your design
+              projects with professional assets.
             </p>
             {/* Social & Newsletter */}
-            <div className="w-full max-w-md mx-auto">
+            {/* <div className="w-full max-w-md mx-auto">
               <form className="flex flex-row items-stretch">
                 <input
                   type="email"
@@ -38,7 +38,7 @@ export default function Footer() {
                   Subscribe
                 </button>
               </form>
-            </div>
+            </div> */}
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
@@ -51,11 +51,11 @@ export default function Footer() {
                     About Us
                   </Link>
                 </li>
-                <li>
+                {/* <li>
                   <Link href="/blog" className="hover:text-white transition">
                     Blog
                   </Link>
-                </li>
+                </li> */}
 
                 <li>
                   <Link href="/contact" className="hover:text-white transition">
@@ -99,7 +99,7 @@ export default function Footer() {
                   <CiInstagram />
                 </Link>
                 <Link
-                  href="https://instagram.com/mockupforest"
+                  href="https://x.com/mockupforest"
                   aria-label="Instagram"
                   className="hover:text-white transition"
                 >

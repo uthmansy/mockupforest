@@ -111,6 +111,14 @@ export default async function MockupDetailPage({ params }: Props) {
                     Download PSD
                   </a>
                 )}
+                {mockup.is_editable && (
+                  <Link
+                    href={`/editor/${mockup.slug}`}
+                    className="block w-full text-center bg-orange-600 text-white px-6 py-3 uppercase text-sm font-normal hover:bg-primary-dark transition"
+                  >
+                    Edit Online
+                  </Link>
+                )}
 
                 {/* Categories */}
                 {mockup.categories?.length > 0 && (
@@ -162,12 +170,12 @@ export default async function MockupDetailPage({ params }: Props) {
                         {mockup.file_size || "N/A"}
                       </span>
                     </li>
-                    <li className="flex space-x-3 items-center">
+                    {/* <li className="flex space-x-3 items-center">
                       <CiSquareCheck />
                       <span className="text-gray-500">
                         {mockup.file_dimensions || "N/A"}
                       </span>
-                    </li>
+                    </li> */}
                     <li className="flex space-x-3 items-center">
                       <CiSquareCheck />
                       <span className="text-gray-500">

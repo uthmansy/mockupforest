@@ -16,7 +16,7 @@ export interface Category {
 const categories: Category[] = [
   { id: "1", name: "Devices", slug: "devices", Icon: <CiLaptop /> },
   { id: "2", name: "Packaging", slug: "packaging", Icon: <CiBoxes /> },
-  { id: "3", name: "Apparel", slug: "apparel", Icon: <CiShirt /> },
+  // { id: "3", name: "Apparel", slug: "apparel", Icon: <CiShirt /> },
   { id: "4", name: "Stationery", slug: "stationery", Icon: <CiFileOn /> },
 ];
 
