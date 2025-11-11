@@ -21,7 +21,7 @@ export interface Layer {
   croppedAreaPixels?: Area | null;
   croppedArea?: Area | null;
   zoom?: number;
-  type: "design" | "color";
+  type: "design" | "color" | "background";
   color?: string;
   aspectRatio?: number;
   noiseThreshold: number;

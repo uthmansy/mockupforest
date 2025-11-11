@@ -19,6 +19,7 @@ import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { ColorLayer } from "./ColorLayer";
 import { useGlobalSettingsStore } from "@/app/stores/useGlobalSettingsStore";
 import { useTextures } from "@/app/hooks/useTextures";
+import { BackgroundLayer } from "./BackgroundLayer";
 
 export interface MockupCanvasProps extends MockupSceneProps {
   canvasWidth?: number;
@@ -113,6 +114,23 @@ export const MockupCanvas: React.FC<MockupCanvasProps> = ({
             zIndex={layer.zIndex}
             croppedArea={layer.croppedAreaPixels}
             noiseAmount={layer.noiseThreshold}
+            highlightIntensity={layer.highlightsIntensity}
+            shadowIntensity={layer.shadowIntensity}
+          />
+        );
+      }
+
+      if (layer.type === "background") {
+        return (
+          <BackgroundLayer
+            key={layer.id}
+            height={layer.height}
+            width={layer.width}
+            mask={layer.mask}
+            zIndex={layer.zIndex}
+            color={layer.color}
+            noiseAmount={layer.noiseThreshold}
+            id={layer.id}
             highlightIntensity={layer.highlightsIntensity}
             shadowIntensity={layer.shadowIntensity}
           />

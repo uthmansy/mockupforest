@@ -54,7 +54,7 @@ export default async function MockupsPage({
         </section>
         <section className="py-5">
           <Container>
-            <h1 className="text-2xl mb-10">All Free PSD Mockups</h1>
+            <h1 className="text-2xl mb-10">All Free Mockups</h1>
             <MockupGallery searchParams={searchParams} />
           </Container>
         </section>

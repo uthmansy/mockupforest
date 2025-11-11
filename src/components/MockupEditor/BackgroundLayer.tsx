@@ -6,7 +6,7 @@ import * as THREE from "three";
 import { useLayersStore } from "@/app/stores/useLayersStore";
 import { useGlobalSettingsStore } from "@/app/stores/useGlobalSettingsStore";
 
-interface ColorLayerProps {
+interface BackgroundLayerProps {
   mask: string; // Mask texture URL
   color?: string; // Flat color to apply
   width: number;
@@ -18,36 +18,33 @@ interface ColorLayerProps {
   id: number;
 }
 
-export const ColorLayer: React.FC<ColorLayerProps> = ({
+export const BackgroundLayer: React.FC<BackgroundLayerProps> = ({
   mask,
   color = "#ffffff",
   width,
   height,
   zIndex,
-  shadowIntensity = 0.55,
-  highlightIntensity = 1.42,
+  shadowIntensity = 2.0,
+  highlightIntensity = 0.16,
   noiseAmount = 0,
   id,
 }) => {
   const { gl } = useThree();
   const setLoading = useLayersStore((s) => s.setLoading);
-  const global = useGlobalSettingsStore(); // 👈 access shared global textures
+  const global = useGlobalSettingsStore();
   const setColorLoading = useLayersStore((s) => s.setColorLoading);
 
   const maskTex = useRef<THREE.Texture | null>(null);
   const materialRef = useRef<THREE.ShaderMaterial>(null);
   const colorRef = useRef(new THREE.Color(color));
   const [ready, setReady] = useState(false);
-
   const hasRenderedRef = useRef(false);
 
   useFrame(() => {
     if (!hasRenderedRef.current && materialRef.current) {
       hasRenderedRef.current = true;
-      // Now it's been submitted to GPU at least once
-      // Optional: defer one more frame if you want extra safety
       queueMicrotask(() => {
-        setColorLoading(id, false); // or notify parent
+        setColorLoading(id, false);
       });
     }
   });
@@ -71,7 +68,6 @@ export const ColorLayer: React.FC<ColorLayerProps> = ({
 
         maskTex.current = texture;
         setReady(true);
-        // setLoading(false);
       },
       undefined,
       (err) => {
@@ -88,7 +84,7 @@ export const ColorLayer: React.FC<ColorLayerProps> = ({
       maskTex.current = null;
       setColorLoading(id, false);
     };
-  }, [mask, gl, setLoading]);
+  }, [mask, gl, setLoading, id, setColorLoading]);
 
   // 🔹 Reactively update color
   useEffect(() => {
@@ -102,6 +98,7 @@ export const ColorLayer: React.FC<ColorLayerProps> = ({
       materialRef.current.uniforms.shadowIntensity.value = shadowIntensity;
       materialRef.current.uniforms.highlightIntensity.value =
         highlightIntensity;
+      materialRef.current.uniforms.noiseAmount.value = noiseAmount;
     }
   });
 
@@ -119,7 +116,7 @@ export const ColorLayer: React.FC<ColorLayerProps> = ({
         depthWrite={false}
         uniforms={{
           maskTexture: { value: maskTex.current },
-          baseTexture: { value: global.baseTexture }, // 👈 use global base
+          baseTexture: { value: global.baseTexture },
           flatColor: { value: colorRef.current },
           shadowIntensity: { value: shadowIntensity },
           highlightIntensity: { value: highlightIntensity },
@@ -133,7 +130,7 @@ export const ColorLayer: React.FC<ColorLayerProps> = ({
           }
         `}
         fragmentShader={`
-         precision highp float;
+          precision highp float;
 
           uniform sampler2D maskTexture;
           uniform sampler2D baseTexture;
@@ -146,7 +143,7 @@ export const ColorLayer: React.FC<ColorLayerProps> = ({
 
           // Simple hash-based noise
           float random(vec2 st) {
-            return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+            return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
           }
 
           void main() {
@@ -156,47 +153,84 @@ export const ColorLayer: React.FC<ColorLayerProps> = ({
 
             vec3 baseCol = texture2D(baseTexture, vUv).rgb;
 
-            // --- Base lighting normalization ---
+            // --- Calculate base brightness ---
             float brightness = dot(baseCol, vec3(0.3333));
-            float mid = 0.35;
-            float t = smoothstep(mid - 0.3, mid + 0.67, brightness);
-            // float low = brightness * 1.5;
-            float low = pow(brightness, 1.2) * 1.5;
-            float high = 0.2 + (brightness - 0.55);
-            float normalized = mix(low, high, t);
+            
+            // --- Normalize brightness with smoother curve ---
+            float normalized = pow(brightness, 1.1) * 1.1;
+            normalized = clamp(normalized, 0.0, 1.0);
 
-            // --- Add slight procedural noise ---
-            float noise = random(vUv * 1024.0) * 2.0 - 1.0;
-            normalized = clamp(normalized + noise * noiseAmount, 0.0, 1.0);
-
-            // --- Adaptive brightness calibration ---
+            // --- Calculate color brightness for adaptive effects ---
             float colorBrightness = dot(flatColor, vec3(0.299, 0.587, 0.114));
 
-            // Slightly compress very bright colors so white areas don’t blow out
-            float adaptiveScale = mix(1.0, 0.90, smoothstep(0.8, 1.0, colorBrightness));
+            // --- FIXED: Better color calibration that preserves highlights for dark colors ---
+            float adaptiveScale = 1.0;
+            if (colorBrightness < 0.3) {
+              // For dark colors, use gentler scaling to preserve highlight details
+              adaptiveScale = mix(0.85, 1.0, colorBrightness / 0.3);
+            } else {
+              // Bright colors get slight compression to prevent blowout
+              adaptiveScale = mix(1.0, 0.9, smoothstep(0.3, 1.0, colorBrightness));
+            }
             vec3 calibratedColor = flatColor * adaptiveScale;
 
-            // Adaptive shadow: brighter colors get slightly stronger shadows
-            float adaptiveShadowIntensity = shadowIntensity * mix(1.0, 1.25, smoothstep(0.6, 1.0, colorBrightness));
+            // --- FIXED: More balanced shadow intensity ---
+            float adaptiveShadowIntensity = shadowIntensity;
+            if (colorBrightness < 0.5) {
+              // Slightly reduce shadow intensity for very dark colors but not too much
+              adaptiveShadowIntensity = shadowIntensity * mix(0.7, 1.0, colorBrightness / 0.5);
+            }
 
             // --- Lighting factors ---
             float shadowFactor = mix(1.0 - adaptiveShadowIntensity, 1.0, normalized);
-            float highlightFactor = smoothstep(0.2, 1.0, normalized) * highlightIntensity;
+            
+            // FIXED: Ensure dark colors still get highlights from base texture
+            float highlightFactor = smoothstep(0.1, 0.8, normalized) * highlightIntensity;
+            
+            // Don't reduce highlights for dark colors - let them show base texture details
+            // highlightFactor remains unchanged for all colors
 
-            // --- Apply lighting ---
+            // --- FIXED: Apply lighting with better balance for dark colors ---
             vec3 shadowed = calibratedColor * shadowFactor;
-            float highlightBoost = (1.0 - colorBrightness) * 0.5;
-            vec3 highlighted = calibratedColor + baseCol * highlightFactor * (1.0 + highlightBoost);
+            
+            // Use base color for highlights - this is key for dark colors to show texture
+            float highlightBoost = (1.0 - colorBrightness) * 0.4;
+            vec3 highlighted = calibratedColor + baseCol * highlightFactor * (0.7 + highlightBoost);
 
+            // Mix between shadow and highlight based on normalized brightness
             vec3 finalCol = mix(shadowed, highlighted, normalized);
+            
+            // FIXED: Better clamping that preserves highlight details for dark colors
             finalCol = clamp(finalCol, 0.0, 1.0);
-            finalCol = max(finalCol, calibratedColor * 0.3); // brightness floor
+            
+            // Ensure dark colors don't get blown out but can still show highlights
+            if (colorBrightness < 0.2) {
+              finalCol = min(finalCol, calibratedColor * 2.0); // Allow some highlight
+            } else {
+              finalCol = max(finalCol, calibratedColor * 0.2); // brightness floor
+            }
+
+            // --- FIXED: Apply visible artistic noise to final color ---
+            // Apply noise in a way that's actually visible
+            float noise1 = random(vUv * 512.0) * 2.0 - 1.0;
+            float noise2 = random(vUv * 256.0 + 0.5) * 2.0 - 1.0;
+            float combinedNoise = (noise1 + noise2) * 0.5;
+            
+            // Apply noise to the final color with user-controlled intensity
+            finalCol += combinedNoise * noiseAmount * 0.15;
+
+            // --- Apply dithering to eliminate banding ---
+            float dither = random(gl_FragCoord.xy) - 0.5;
+            finalCol += dither / 255.0;
+
+            // Ensure we don't go out of bounds after dithering and noise
+            finalCol = clamp(finalCol, 0.0, 1.0);
 
             // --- Smooth mask edge ---
             float alpha = smoothstep(0.1, 0.3, mask.r);
+            
             gl_FragColor = vec4(finalCol, alpha);
           }
-
         `}
       />
     </mesh>

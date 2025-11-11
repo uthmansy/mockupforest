@@ -316,7 +316,7 @@ export const DesignLayer: React.FC<DesignLayerProps> = ({
 
             // Smooth mask alpha
             float maskValue = texture2D(maskTexture, vUv).r;
-            float alpha = smoothstep(0.1, 0.3, maskValue) * designColor.a;
+            float alpha = smoothstep(0.02, 0.98, maskValue) * designColor.a;
 
             gl_FragColor = vec4(finalCol, alpha);
           }
