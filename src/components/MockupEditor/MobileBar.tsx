@@ -25,6 +25,7 @@ function MobileBar() {
   // Icon configuration to avoid conditional rendering in JSX
   const layerIcons = {
     color: IoColorFilter,
+    background: IoColorFilter,
     design: MdImage,
   };
 
