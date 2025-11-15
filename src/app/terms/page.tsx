@@ -83,7 +83,9 @@ export default function TermsPage() {
             <h3>7. Contact</h3>
             <p>
               For any questions about these Terms, please contact me at:{" "}
-              <a href="mailto:info@mockupforest.com">info@mockupforest.com</a>
+              <a href="mailto:support@mockupforest.com">
+                support@mockupforest.com
+              </a>
             </p>
           </div>
         </main>

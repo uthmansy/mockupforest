@@ -100,7 +100,7 @@ export default function PrivacyPolicyPage() {
             <h3>9. Contact Us</h3>
             <p>
               If you have questions about this Privacy Policy, please contact us
-              at: <strong>[Your Email Here]</strong>
+              at: <strong>support@mockupforest.com</strong>
             </p>
           </div>
         </main>
