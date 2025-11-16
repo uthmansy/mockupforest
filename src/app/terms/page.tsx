@@ -1,7 +1,6 @@
 import Container from "@/components/Container";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
-import { Button } from "@chakra-ui/react";
 
 export const metadata = {
   title: "Terms of Service - MockupForest",
@@ -14,9 +13,8 @@ export const revalidate = 60;
 export default function TermsPage() {
   return (
     <>
-      <Header />{" "}
+      <Header />
       <Container>
-        <Button>Click me</Button>
         <main className="max-w-3xl mx-auto py-16 prose prose-neutral">
           <h1 className="text-3xl font-medium text-gray-900 mb-8">
             Terms of Service

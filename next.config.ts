@@ -6,10 +6,6 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
 
-  experimental: {
-    optimizePackageImports: ["@chakra-ui/react"],
-  },
-
   // Ignore ESLint build errors
   eslint: {
     ignoreDuringBuilds: true,
