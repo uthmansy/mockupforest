@@ -33,6 +33,7 @@ export default async function MockupGallery({ searchParams }: Props) {
         count: "exact",
       }
     )
+    .eq("is_editable", true)
     .order("created_at", { ascending: false })
     .range(from, to);
 

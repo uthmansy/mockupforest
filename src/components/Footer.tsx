@@ -6,7 +6,7 @@ import { CiFacebook, CiInstagram, CiTwitter } from "react-icons/ci";
 
 export default function Footer() {
   return (
-    <footer className="site-footer bg-sage-dark border-t border-gray-700 uppercase">
+    <footer className="site-footer bg-neutral-800 border-t border-gray-700 uppercase">
       <Container>
         <div className="py-24 grid grid-cols-1 sm:grid-cols-2 gap-8">
           {/* Branding */}

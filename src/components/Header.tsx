@@ -19,7 +19,7 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 bg-white shadow-md">
+    <header className="sticky top-0 z-50 bg-milk border-b border-primary/30">
       <Container>
         <div className="flex items-center justify-between py-5">
           {/* Logo */}
@@ -40,7 +40,7 @@ export default function Header() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="relative group text-black hover:text-gray-900 transition-colors uppercase text-sm font-light"
+                  className="relative group text-black hover:text-gray-900 transition-colors uppercase text-sm"
                 >
                   {item.label}
                   <span className="absolute left-0 -bottom-1 w-0 h-[1.5px] bg-primary group-hover:w-full transition-all"></span>

@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
 import Container from "@/components/Container";
+import { Input } from "@heroui/input";
+import { Button } from "@heroui/button";
 
 export default function HeroSearch() {
   const [query, setQuery] = useState("");
@@ -16,27 +18,51 @@ export default function HeroSearch() {
   };
 
   return (
-    <section className="py-16 text-center bg-sage-light text-sage-dark">
+    <div className="py-14 bg-milk">
       <Container>
-        <h1 className="max-w-screen-md mx-auto text-2xl md:text-3xl lg:text-5xl font-light mb-6">
-          The best free online Mockup Generator!
-        </h1>
-
         {/* Search Bar */}
-        <div className="max-w-2xl mx-auto mt-8">
-          <div className="flex items-center border border-gray-300 bg-white px-4 py-3 shadow-md focus-within:ring-2 focus-within:ring-primary">
-            <Search className="text-gray-400 w-5 h-5 mr-3" />
-            <input
-              type="text"
-              placeholder="Search mockups, e.g., iPhone, packaging, apparel..."
-              className="w-full text-base focus:outline-none bg-transparent placeholder-gray-400"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onKeyDown={handleKeyDown}
-            />
-          </div>
+        <h1 className="text-5xl md:text-7xl font-normal leading-[1.1] uppercase">
+          Create Pro Mockups Right in the Browser.
+        </h1>
+        <div className="">
+          <Input
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={handleKeyDown}
+            isClearable
+            classNames={{
+              label: "text-black/50 dark:text-white/90",
+              input: [
+                "bg-transparent",
+                "text-black/90 dark:text-white/90",
+                "placeholder:text-default-700/50 dark:placeholder:text-white/60",
+              ],
+              innerWrapper: "bg-transparent",
+              inputWrapper: [
+                "bg-white",
+                // "dark:bg-default/60",
+                // "backdrop-blur-xl",
+                // "backdrop-saturate-200",
+                "hover:bg-white",
+                "group-data-[focus=true]:bg-white/90",
+                "cursor-text! h-16 rounded-full",
+              ],
+            }}
+            placeholder="Type to search..."
+            radius="lg"
+            startContent={
+              <div className="flex space-x-3 items-center">
+                <Button
+                  size="lg"
+                  className="bg-primary text-white px-8 uppercase rounded-full"
+                >
+                  Search
+                </Button>
+                <Search className="text-gray-400 w-5 h-5 mr-3" />
+              </div>
+            }
+          />
         </div>
       </Container>
-    </section>
+    </div>
   );
 }

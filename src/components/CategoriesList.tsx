@@ -16,24 +16,23 @@ export interface Category {
 const categories: Category[] = [
   { id: "1", name: "Devices", slug: "devices", Icon: <CiLaptop /> },
   { id: "2", name: "Packaging", slug: "packaging", Icon: <CiBoxes /> },
-  // { id: "3", name: "Apparel", slug: "apparel", Icon: <CiShirt /> },
   { id: "4", name: "Stationery", slug: "stationery", Icon: <CiFileOn /> },
+  { id: "5", name: "Cosmetics", slug: "cosmetics", Icon: <CiLaptop /> },
+  { id: "6", name: "Apparels", slug: "apparels", Icon: <CiBoxes /> },
+  { id: "7", name: "Posters", slug: "posters", Icon: <CiFileOn /> },
 ];
 
 export default function CategoriesList() {
   return (
     <div className="overflow-x-auto">
-      <ul className="flex space-x-6 px-6 list-none mb-0">
+      <ul className="flex space-x-3 px-6 list-none mb-0">
         {categories.map(({ id, name, slug, Icon }) => (
           <li key={id} className="flex-shrink-0">
             <Link
               href={`/category/${slug}`}
-              className="flex flex-col items-center text-center text-black hover:text-primary transition"
+              className="flex flex-col items-center text-center text-black hover:text-primary transition bg-gray-100 rounded-full py-3 px-4 border-dashed border border-primary"
             >
-              <div className="w-16 h-16 mb-2 p-3 rounded-full bg-gray-100 flex items-center justify-center text-3xl">
-                {Icon}
-              </div>
-              <span className="text-sm uppercase">{name}</span>
+              <span className="text-sm">{name}</span>
             </Link>
           </li>
         ))}
