@@ -149,7 +149,7 @@ ol {
 }
 
 .mobile-bar__content {
-  @apply min-h-max text-white fixed bottom-24 right-0 left-0 z-10 bg-inherit;
+  @apply min-h-max text-white absolute bottom-24 right-0 left-0 z-10 bg-inherit;
 }
 
 .mobile-bar__panel {

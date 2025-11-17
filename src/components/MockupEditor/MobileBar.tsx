@@ -30,7 +30,7 @@ function MobileBar() {
   };
 
   return (
-    <div className="mobile-bar">
+    <div className="mobile-bar relative">
       {/* Content Area */}
       <div className="mobile-bar__content">
         {layers.map((layer) => (
@@ -54,7 +54,7 @@ function MobileBar() {
       </div>
 
       {/* Tab Navigation */}
-      <nav className="mobile-bar__navigation" role="tablist">
+      <nav className="mobile-bar__navigation overflow-y-auto" role="tablist">
         {layers.map((layer) => {
           const IconComponent = layerIcons[layer.type];
           const isActive = layer.id === currentLayerId;

@@ -15,6 +15,7 @@ import SettingsPanel from "./SettingsPanel";
 import Link from "next/link";
 import Image from "next/image";
 import AppHeader from "./AppHeader";
+import EmailCollectionModal from "../EmailCollectionModal";
 
 interface Props {
   mockupData?: Mockup;
@@ -124,27 +125,30 @@ export default function MockupEditor({ mockupData }: Props) {
   }
 
   return (
-    <div className="h-screen flex flex-col md:flex-row overflow-hidden">
-      {isLargeScreen && (
-        <div className="md:w-60 xl:w-72 h-full overflow-y-auto max-h-full bg-neutral-900 border-white/20 border-r-[0.5px] scrollbar-dark">
-          <Sidebar />
-        </div>
-      )}
+    <>
+      <EmailCollectionModal />
+      <div className="h-screen flex flex-col md:flex-row overflow-hidden">
+        {isLargeScreen && (
+          <div className="md:w-60 xl:w-72 h-full overflow-y-auto max-h-full bg-neutral-900 border-white/20 border-r-[0.5px] scrollbar-dark">
+            <Sidebar />
+          </div>
+        )}
 
-      <div className="flex-1 flex flex-col">
-        <AppHeader glRef={glRef} mockupData={mockupData} user={user} />
-        <MockupCanvas
-          setGlRef={setGlRef}
-          canvasWidth={canvasWidth * 0.5 || 2000}
-          canvasHeight={canvasHeight * 0.5 || 1500}
-        />
+        <div className="flex-1 flex flex-col">
+          <AppHeader glRef={glRef} mockupData={mockupData} user={user} />
+          <MockupCanvas
+            setGlRef={setGlRef}
+            canvasWidth={canvasWidth * 0.5 || 2000}
+            canvasHeight={canvasHeight * 0.5 || 1500}
+          />
+        </div>
+
+        {isMobile && (
+          <div className="bg-neutral-700">
+            <MobileBar />
+          </div>
+        )}
       </div>
-
-      {isMobile && (
-        <div className="bg-neutral-700">
-          <MobileBar />
-        </div>
-      )}
-    </div>
+    </>
   );
 }
