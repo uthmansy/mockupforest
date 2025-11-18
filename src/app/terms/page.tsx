@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 export const metadata = {
   title: "Terms of Service - MockupForest",
   description:
-    "Read the terms of service for MockupForest. Free PSD mockups for personal and commercial use. Redistribution rules and licensing details.",
+    "Read the terms of service for MockupForest. Free mockups for personal and commercial use. Redistribution rules and licensing details.",
 };
 
 export const revalidate = 60;

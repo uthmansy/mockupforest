@@ -12,9 +12,9 @@ import Link from "next/link";
 import RecentAdditions from "@/components/RecentAdditions";
 
 export const metadata: Metadata = {
-  title: "Free PSD Mockups",
+  title: "Free Studio Quality Mockups in the Browser",
   description:
-    "Download high-quality free PSD mockups for devices, branding, and more.",
+    "Create high quality pro Mockups right in the browser in second - No photoshop required.",
 };
 
 export default function Home({
