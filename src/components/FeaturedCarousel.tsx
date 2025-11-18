@@ -43,7 +43,7 @@ export default function FeaturedCarousel({ mockups }: FeaturedCarouselProps) {
   }, []);
 
   // Calculate item width (show 3.5 items to reveal partial next item)
-  const itemsToShow = 3.5;
+  const itemsToShow = 2.5;
   const gap = 16; // 1rem gap
   const itemWidth = (containerWidth - (itemsToShow - 1) * gap) / itemsToShow;
   const totalWidth = mockups.length * (itemWidth + gap) - gap;
