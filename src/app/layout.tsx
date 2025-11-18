@@ -17,9 +17,9 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Free PSD Mockups",
+  title: "Free Studio Quality Mockups in the Browser",
   description:
-    "Download high-quality free PSD mockups for devices, branding, and more.",
+    "Create high quality pro Mockups right in the browser in second - No photoshop required",
   icons: {
     icon: "/favicon.ico", // primary favicon
     shortcut: "/favicon-16x16.png",
