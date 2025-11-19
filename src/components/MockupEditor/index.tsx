@@ -126,7 +126,7 @@ export default function MockupEditor({ mockupData }: Props) {
 
   return (
     <>
-      <EmailCollectionModal />
+      {/* <EmailCollectionModal /> */}
       <div className="h-screen flex flex-col md:flex-row overflow-hidden">
         {isLargeScreen && (
           <div className="md:w-60 xl:w-72 h-full overflow-y-auto max-h-full bg-neutral-900 border-white/20 border-r-[0.5px] scrollbar-dark">
