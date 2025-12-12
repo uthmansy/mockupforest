@@ -31,7 +31,7 @@ export const DesignLayer: React.FC<DesignLayerProps> = ({
   shadowIntensity = 0.55,
   highlightIntensity = 1.42,
   noiseAmount = 0,
-  vibrance = 0.1, // ← default no vibrance
+  vibrance = 0, // ← default no vibrance
   id,
 }) => {
   const { gl } = useThree();
