@@ -7,6 +7,7 @@ import * as THREE from "three";
 import { useGlobalSettingsStore } from "@/app/stores/useGlobalSettingsStore";
 import { getMockupById } from "@/app/lib/utils";
 import { Mockup } from "@/types/db";
+import { SlSettings } from "react-icons/sl";
 
 interface Props {
   mockupId: string;
@@ -371,11 +372,11 @@ function SettingsPanel({ mockupId, glRef }: Props) {
     <div className="relative">
       <button
         onClick={() => setShowPanel(!showPanel)}
-        className="bg-primary rounded-md px-5 py-2 uppercase text-sm overflow-hidden cursor-pointer text-white hover:bg-primary/70 transition-colors"
+        className="h-[3rem] w-[3rem] flex items-center justify-center uppercase text-sm overflow-hidden cursor-pointer text-white hover:bg-white/10 transition-colors"
         aria-expanded={showPanel}
         aria-haspopup="dialog"
       >
-        Settings
+        <SlSettings className="text-2xl" />
       </button>
 
       <AnimatePresence>

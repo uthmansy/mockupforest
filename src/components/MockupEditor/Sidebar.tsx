@@ -26,7 +26,7 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-full rounded-lg overflow-hidden h-full shadow-xl">
+    <aside className="w-full rounded-lg overflow-hidden h-full">
       {/* Header */}
       <div className="p-4 border-b border-white/10 pt-10">
         <div className="flex items-center justify-between mb-3">
@@ -104,7 +104,7 @@ export default function Sidebar() {
                     : "opacity-0 max-h-0 overflow-hidden"
                 }`}
               >
-                <div className="p-4 pl-12 border-t border-neutral-300 bg-neutral-200">
+                <div className="p-4 pl-12 border-t border-neutral-300 bg-neutral-200/75">
                   {isDesignLayer ? (
                     <FileUpload layerId={layer.id} label="Your Design" />
                   ) : (

@@ -247,9 +247,9 @@ export default function AppHeader({ glRef, user, mockupData }: AppHeaderProps) {
 
           {/* Actions */}
           <div className="flex items-center">
-            {/* {user && glRef && (
+            {user && glRef && (
               <SettingsPanel glRef={glRef} mockupId={mockupData.id} />
-            )} */}
+            )}
             <button
               onClick={() => setShowMockupGallery(true)}
               className="bg-white/20 m-0 text-white hidden md:flex items-center justify-center h-[3rem] w-[3rem] hover:bg-white/30 cursor-pointer transition-all duration-200 group"

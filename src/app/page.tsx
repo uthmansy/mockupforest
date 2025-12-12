@@ -5,11 +5,6 @@ import CategoriesList from "@/components/CategoriesList";
 import HeroSearch from "@/components/HeroSearch";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import FeaturedMockups from "@/components/FeaturedMockups";
-import { Divider } from "@heroui/divider";
-import { Button } from "@heroui/button";
-import Link from "next/link";
-import RecentAdditions from "@/components/RecentAdditions";
 
 export const metadata: Metadata = {
   title: "Free Studio Quality Mockups in the Browser",
@@ -17,11 +12,12 @@ export const metadata: Metadata = {
     "Create high quality pro Mockups right in the browser in second - No photoshop required.",
 };
 
-export default function Home({
-  searchParams,
+export default async function Home({
+  searchParams: searchParamsPromise,
 }: {
-  searchParams: { page?: string };
+  searchParams: Promise<{ page?: string }>;
 }) {
+  const searchParams = await searchParamsPromise;
   return (
     <>
       <Header />

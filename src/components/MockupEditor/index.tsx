@@ -133,9 +133,9 @@ export default function MockupEditor({ mockupData }: Props) {
     <div className="h-screen">
       {/* <EmailCollectionModal /> */}
       <AppHeader glRef={glRef} mockupData={mockupData} user={user} />
-      <div className="h-[calc(100vh-3rem)] flex flex-col md:flex-row overflow-hidden bg-neutral-300">
+      <div className="h-[calc(100vh-3rem)] flex flex-col md:flex-row overflow-hidden bg-neutral-200/90">
         {isLargeScreen && (
-          <div className="sm:w-60 xl:w-72 h-full overflow-y-auto max-h-full border-gray-300 border-r-[0.5px] scrollbar-dark bg-white">
+          <div className="sm:w-60 xl:w-72 h-full overflow-y-auto max-h-full scrollbar-dark shadow-xl bg-white">
             <Sidebar />
           </div>
         )}

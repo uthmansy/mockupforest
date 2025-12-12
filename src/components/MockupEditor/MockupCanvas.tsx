@@ -164,7 +164,7 @@ export const MockupCanvas: React.FC<MockupCanvasProps> = ({
   return (
     <div className="relative w-full h-full flex items-start md:items-center justify-center overflow-hidden p-6">
       {(baseAndUvLoading || isAnyDesignLoading || isAnyColorLoading) && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center backdrop-blur-xs z-50 bg-neutral-100">
+        <div className="absolute inset-0 flex flex-col items-center justify-center backdrop-blur-xs z-50 bg-neutral-200">
           <Spinner color="primary" label="Loading..." variant="wave" />
         </div>
       )}
