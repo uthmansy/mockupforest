@@ -15,17 +15,20 @@ export interface Mockup {
 }
 
 interface Props {
-  searchParams: { page?: string };
+  searchParams: { [key: string]: string | string[] | undefined };
 }
 
 export default async function MockupGallery({ searchParams }: Props) {
-  // const page = parseInt(searchParams.page || "1", 10); //doesnt work in next 16
-  const currentPage = Number(searchParams.page) || 1;
-  const page = Math.max(1, currentPage); // safety
-  const itemsPerPage = 15;
-  const from = (page - 1) * itemsPerPage;
-  const to = from + itemsPerPage - 1;
+  // THIS IS THE ONLY VERSION THAT WORKS IN NEXT.JS 16 (Dec 2025)
+  const pageParam = searchParams.page;
+  const page = Array.isArray(pageParam)
+    ? Number(pageParam[0]) || 1
+    : Number(pageParam) || 1;
 
+  const safePage = Math.max(1, page);
+  const itemsPerPage = 15;
+  const from = (safePage - 1) * itemsPerPage;
+  const to = from + itemsPerPage - 1;
   // Fetch paginated mockups
   const { data, error, count } = await supabase
     .from("mockups")
