@@ -75,12 +75,11 @@ export default function Sidebar() {
                   </motion.div>
 
                   <div className="flex items-center gap-2 min-w-0 flex-1">
-                    <span className="text-sm uppercase truncate inline-block min-w-0">
-                      Layer{" "}
-                      <span className="text-xs text-neutral-600 px-2 py-0.5 bg-neutral-200 mx-3 rounded">
+                    <span className="text-sm uppercase truncate inline-block min-w-0 space-x-3">
+                      <span className="text-xs text-neutral-600 px-2 py-0.5 bg-neutral-200 rounded">
                         {layer.id}
                       </span>
-                      [{layer.name}]
+                      <span>[{layer.name}]</span>
                     </span>
                   </div>
                 </div>
