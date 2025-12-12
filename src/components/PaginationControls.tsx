@@ -1,5 +1,6 @@
 // components/PaginationControls.tsx
 import Link from "next/link";
+import { BsArrowLeft, BsArrowRight } from "react-icons/bs";
 
 interface PaginationControlsProps {
   currentPage: number;
@@ -48,10 +49,10 @@ export default function PaginationControls({
       <Link
         key={page}
         href={href}
-        className={`px-4 py-2 text-sm font-medium transition ${
+        className={`h-12 w-12 flex items-center justify-center text-sm font-medium transition rounded-full ${
           isActive
             ? "bg-primary text-white"
-            : "bg-white text-gray-700 hover:bg-gray-100"
+            : "bg-neutral-100 text-gray-700 hover:bg-neutral-200"
         }`}
       >
         {page}
@@ -67,12 +68,13 @@ export default function PaginationControls({
       {/* Previous Button */}
       <Link
         href={currentPage > 1 ? buildHref(currentPage - 1) : ""}
-        className={`px-4 py-2 text-sm font-medium transition ${
+        className={`px-4 h-12 flex items-center text-sm font-medium transition rounded-full group ${
           currentPage === 1
-            ? "bg-gray-200 text-gray-400 pointer-events-none"
+            ? "bg-neutral-200 text-gray-400 pointer-events-none"
             : "bg-primary text-white hover:bg-primary-dark"
         }`}
       >
+        <BsArrowLeft className="text-xl mr-3 group-hover:mr-5 transition-all duration-150" />
         Prev
       </Link>
 
@@ -90,13 +92,14 @@ export default function PaginationControls({
       {/* Next Button */}
       <Link
         href={currentPage < totalPages ? buildHref(currentPage + 1) : ""}
-        className={`px-4 py-2 text-sm font-medium transition ${
+        className={`px-4 h-12 flex items-center text-sm font-medium transition rounded-full group ${
           currentPage === totalPages
-            ? "bg-gray-200 text-gray-400 pointer-events-none"
+            ? "bg-neutral-200 text-gray-400 pointer-events-none"
             : "bg-primary text-white hover:bg-primary-dark"
         }`}
       >
-        Next
+        Next{" "}
+        <BsArrowRight className="text-xl ml-3 group-hover:ml-5 transition-all duration-150" />
       </Link>
     </nav>
   );

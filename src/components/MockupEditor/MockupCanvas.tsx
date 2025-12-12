@@ -10,16 +10,17 @@ import {
   useEffect,
   useMemo,
   useRef,
+  useState,
 } from "react";
 import { MockupSceneProps } from "@/components/MockupEditor/types";
 import { DesignLayer } from "./DesignLayer";
 import BaseLayer from "./BaseLayer";
 import { useLayersStore } from "@/app/stores/useLayersStore";
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { ColorLayer } from "./ColorLayer";
 import { useGlobalSettingsStore } from "@/app/stores/useGlobalSettingsStore";
 import { useTextures } from "@/app/hooks/useTextures";
 import { BackgroundLayer } from "./BackgroundLayer";
+import { Spinner } from "@heroui/react";
 
 export interface MockupCanvasProps extends MockupSceneProps {
   canvasWidth?: number;
@@ -35,8 +36,22 @@ export const MockupCanvas: React.FC<MockupCanvasProps> = ({
   setGlRef,
 }) => {
   const glRef = useRef<THREE.WebGLRenderer>(null);
+
+  // -------------------------------------------------
+  // SIMPLE ZOOM STATE  (scales the wrapper div)
+  // -------------------------------------------------
+  const [zoom, setZoom] = useState(1);
+
+  const handleWheelZoom = (e: React.WheelEvent) => {
+    e.preventDefault();
+    setZoom(
+      (z) => THREE.MathUtils.clamp(z - e.deltaY * 0.0015, 0.5, 3) // range 0.5 → 3
+    );
+  };
+
   const { layers, baseAndUvLoading, designLoadings, colorLoadings } =
     useLayersStore();
+
   const designLayers = useMemo(
     () => layers.filter((l) => l.type === "design"),
     [layers]
@@ -49,23 +64,20 @@ export const MockupCanvas: React.FC<MockupCanvasProps> = ({
   const isAnyDesignLoading = useMemo(() => {
     const values = Object.values(designLoadings);
     const hasDesignLayers = designLayers.length > 0;
-
-    if (!hasDesignLayers) return false; // nothing to wait for
-    if (values.length === 0) return true; // waiting for first registration
-    return values.some(Boolean); // any still loading
+    if (!hasDesignLayers) return false;
+    if (values.length === 0) return true;
+    return values.some(Boolean);
   }, [designLoadings, designLayers]);
 
   const isAnyColorLoading = useMemo(() => {
     const values = Object.values(colorLoadings);
     const hasColorLayers = colorLayers.length > 0;
-
-    if (!hasColorLayers) return false; // nothing to wait for
-    if (values.length === 0) return true; // waiting for first registration
-    return values.some(Boolean); // any still loading
+    if (!hasColorLayers) return false;
+    if (values.length === 0) return true;
+    return values.some(Boolean);
   }, [colorLoadings, colorLayers]);
 
   const { uv, base, setUvTexture, setBaseTexture } = useGlobalSettingsStore();
-
   const { uvTexture, baseTexture } = useTextures({ uv, base });
 
   useEffect(() => {
@@ -73,11 +85,11 @@ export const MockupCanvas: React.FC<MockupCanvasProps> = ({
     if (baseTexture) setBaseTexture(baseTexture);
   }, [uvTexture, baseTexture, setUvTexture, setBaseTexture]);
 
-  // Memoize these values to prevent unnecessary re-renders
   const aspectRatio = useMemo(
     () => `${canvasWidth} / ${canvasHeight}`,
     [canvasWidth, canvasHeight]
   );
+
   const cameraProps = useMemo(
     () => ({
       left: -canvasWidth / 2,
@@ -91,14 +103,9 @@ export const MockupCanvas: React.FC<MockupCanvasProps> = ({
     [canvasWidth, canvasHeight]
   );
 
-  // Set glRef once on mount
-  useEffect(() => {
-    setGlRef(glRef);
-  }, []); // Empty dependency array since glRef is stable
+  useEffect(() => setGlRef(glRef), []);
 
-  // Memoize layers rendering
   const renderedLayers = useMemo(() => {
-    // Sort layers by zIndex before mapping
     const sortedLayers = [...layers].sort((a, b) => a.zIndex - b.zIndex);
 
     return sortedLayers.map((layer) => {
@@ -155,19 +162,26 @@ export const MockupCanvas: React.FC<MockupCanvasProps> = ({
   }, [layers]);
 
   return (
-    <div className="relative w-full h-full flex items-start md:items-center justify-center overflow-hidden p-6 bg-neutral-800">
+    <div className="relative w-full h-full flex items-start md:items-center justify-center overflow-hidden p-6">
       {(baseAndUvLoading || isAnyDesignLoading || isAnyColorLoading) && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center  backdrop-blur-xs text-white z-50 bg-neutral-800">
-          <AiOutlineLoading3Quarters className="animate-spin text-5xl mb-4" />
-          <p className="text-sm uppercase tracking-wider">Loading..</p>
+        <div className="absolute inset-0 flex flex-col items-center justify-center backdrop-blur-xs z-50 bg-neutral-100">
+          <Spinner color="primary" label="Loading..." variant="wave" />
         </div>
       )}
+
+      {/* ZOOM WRAPPER  */}
       <div
-        className="relative flex items-center justify-center w-full max-w-[800px] bg-gray-200 overflow-hidden shadow-md"
-        style={{ aspectRatio }}
+        onWheel={handleWheelZoom} // ← zoom event
+        className="relative flex items-center justify-center w-auto overflow-hidden h-[90%]"
+        style={{
+          aspectRatio,
+          transform: `scale(${zoom})`, // ← apply zoom
+          transformOrigin: "center center", // keep zoom centered
+          transition: "transform 0.1s linear", // smooth zoom
+        }}
       >
         <Canvas
-          style={{ width: "100%", height: "100%" }}
+          style={{ width: "100%", height: "100%", background: "#000000" }}
           dpr={1}
           gl={{
             outputColorSpace: THREE.SRGBColorSpace,
@@ -175,14 +189,13 @@ export const MockupCanvas: React.FC<MockupCanvasProps> = ({
             toneMappingExposure: 1.0,
             preserveDrawingBuffer: true,
             antialias: true,
-            powerPreference: "high-performance", // Add this for better GPU performance
+            powerPreference: "high-performance",
           }}
           onCreated={({ gl }) => {
             glRef.current = gl;
             gl.setSize(canvasWidth, canvasHeight, false);
           }}
-          // Add performance optimizations
-          frameloop="demand" // Only render when necessary
+          frameloop="demand"
         >
           <OrthographicCamera makeDefault {...cameraProps} />
 

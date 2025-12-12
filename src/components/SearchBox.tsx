@@ -19,7 +19,7 @@ export default function SearchBox() {
       <input
         type="text"
         placeholder="Search mockups..."
-        className="pl-10 pr-4 py-2 w-64 focus:ring-primary text-sm bg-white/50 rounded-lg"
+        className="pl-10 pr-4 py-2.5 w-64  text-sm bg-gray-50 border-2 border-gray-400 rounded-xl"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         onKeyDown={handleKeyDown}

@@ -8,6 +8,7 @@ import { supabase } from "@/lib/supabaseClient";
 import Download from "./Download";
 import SettingsPanel from "./SettingsPanel";
 import { Mockup } from "@/types/db";
+import { BiSolidGrid } from "react-icons/bi";
 
 interface MockupGalleryProps {
   isOpen: boolean;
@@ -44,7 +45,7 @@ const MockupCard = ({ mockup }: { mockup: any }) => (
       ) : (
         <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-200 to-gray-300">
           <svg
-            className="w-12 h-12 text-gray-400"
+            className="w-12 h-12 "
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -166,7 +167,7 @@ function MockupGallery({ isOpen, onClose }: MockupGalleryProps) {
                 </h3>
                 <button
                   onClick={onClose}
-                  className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-lg hover:bg-gray-100"
+                  className=" hover:text-gray-600 transition-colors p-1 rounded-lg hover:bg-gray-100"
                 >
                   <svg
                     className="w-5 h-5"
@@ -227,10 +228,10 @@ export default function AppHeader({ glRef, user, mockupData }: AppHeaderProps) {
 
   return (
     <>
-      <header className="h-16 border-b border-white/20 bg-neutral-900 px-6">
+      <header className="h-[3rem] bg-black">
         <div className="flex items-center justify-between h-full">
           {/* Logo */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 px-2">
             <div className="h-15 max-h-15 flex items-center p-3">
               <Link href="/">
                 <Image
@@ -245,33 +246,18 @@ export default function AppHeader({ glRef, user, mockupData }: AppHeaderProps) {
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center">
+            {/* {user && glRef && (
+              <SettingsPanel glRef={glRef} mockupId={mockupData.id} />
+            )} */}
             <button
               onClick={() => setShowMockupGallery(true)}
-              className="hidden md:flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-200 group"
+              className="bg-white/20 m-0 text-white hidden md:flex items-center justify-center h-[3rem] w-[3rem] hover:bg-white/30 cursor-pointer transition-all duration-200 group"
             >
-              <svg
-                className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
-                />
-              </svg>
-              More Mockups
+              <BiSolidGrid className="text-xl" />
             </button>
-
-            <div className="w-px h-6 bg-white/20 mx-1" />
-
+            {/* <div className="w-px h-6 bg-white/20 mx-1" /> */}
             {glRef && <Download glRef={glRef} />}
-            {user && glRef && (
-              <SettingsPanel glRef={glRef} mockupId={mockupData.id} />
-            )}
           </div>
         </div>
       </header>

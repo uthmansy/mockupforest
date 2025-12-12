@@ -6,6 +6,7 @@ import PaginationControls from "@/components/PaginationControls";
 import Container from "@/components/Container";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import CategoriesList from "@/components/CategoriesList";
 
 interface Props {
   params: { slug: string };
@@ -35,7 +36,9 @@ export default async function CategorySlugPage({
 
   const { data, error, count } = await supabase
     .from("mockups")
-    .select("id, categories, title, preview_url,slug", { count: "exact" })
+    .select("id, categories, title, preview_url,slug, is_editable", {
+      count: "exact",
+    })
     .contains("categories", [normalizedSlug]) // use normalized slug here
     .order("created_at", { ascending: false })
     .range(from, to);
@@ -52,19 +55,22 @@ export default async function CategorySlugPage({
       categories: item.categories,
       title: item.title,
       thumbnailUrl: item.preview_url ?? "/placeholder.jpg",
+      isEditable: item.is_editable,
     })) ?? [];
 
   return (
     <>
       <Header />
-      <main className="py-16">
+      <section className="sticky top-20 z-30 bg-white">
         <Container>
-          <h1 className="text-3xl text-gray-900 mb-6 capitalize">
-            {normalizedSlug}
-          </h1>
-
+          <div className="max-w-max mx-auto py-4">
+            <CategoriesList currentCat={slug} />
+          </div>
+        </Container>
+      </section>
+      <main className="py-8">
+        <Container>
           <GalleryGrid mockups={mockups} />
-
           <PaginationControls
             currentPage={page}
             totalItems={count ?? 0}

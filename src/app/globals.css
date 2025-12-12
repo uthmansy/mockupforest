@@ -14,7 +14,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-primary: #434834;
+  --color-primary: #b1c61c;
   --color-secondary: #887d69;
   --color-sage-dark: #242c0a;
   --color-sage-light: #c2c2b0;
@@ -41,7 +41,7 @@ html {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-size: calc(13px + 0.1vw);
+  font-size: calc(15px + 0.1vw);
 }
 
 p {
@@ -118,7 +118,7 @@ ol {
 }
 
 .site-footer a {
-  @apply text-inherit hover:text-white;
+  @apply text-inherit hover:text-black;
 }
 
 .scrollbar-dark::-webkit-scrollbar {

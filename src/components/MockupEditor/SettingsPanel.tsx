@@ -371,7 +371,7 @@ function SettingsPanel({ mockupId, glRef }: Props) {
     <div className="relative">
       <button
         onClick={() => setShowPanel(!showPanel)}
-        className="bg-neutral-700 rounded-md px-5 py-2 uppercase text-sm overflow-hidden cursor-pointer text-white hover:bg-neutral-600 transition-colors"
+        className="bg-primary rounded-md px-5 py-2 uppercase text-sm overflow-hidden cursor-pointer text-white hover:bg-primary/70 transition-colors"
         aria-expanded={showPanel}
         aria-haspopup="dialog"
       >

@@ -55,23 +55,18 @@ function Picker({ layerId }: Props) {
 
   return (
     <div className="flex flex-col gap-2 w-full p-6 my-5 md:p-0">
-      <h5 className="uppercase text-sm flex items-center space-x-2">
-        <CiPalette className="text-2xl" />
-        <span className="flex-1 truncate">{layer.name}</span>
-      </h5>
-
       <div className="relative">
         <div className="flex space-x-3" ref={pickerBoxRef}>
           <div
             style={{ background: inputValue }}
-            className="w-12 h-12 cursor-pointer rounded-md border-white/30 border"
+            className="w-12 h-12 cursor-pointer rounded-md border-gray-300 border-2"
             onClick={() => setShowPicker((prev) => !prev)}
           />
           <input
             type="text"
             value={inputValue}
             onChange={(e) => handleInputChange(e.target.value)}
-            className="w-full p-2 bg-neutral-700 hover:bg-neutral-800 transition-all duration-75 cursor-pointer rounded-md text-sm text-white/50 flex-1"
+            className="w-full p-2 bg-white border-2 border-gray-300 hover:bg-gray-50 transition-all duration-75 cursor-pointer rounded-md text-sm flex-1"
             placeholder="#RRGGBB"
           />
         </div>

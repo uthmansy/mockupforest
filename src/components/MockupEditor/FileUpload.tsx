@@ -82,18 +82,13 @@ FileUploadProps) {
 
   return (
     <div className="md:mb-4 p-6 md:p-0">
-      <div className="my-5">
-        <h5 className="uppercase text-sm flex items-center space-x-2 mb-5 text-sage-light">
-          <LuImage className="text-2xl" />
-          <span className="flex-1 truncate">{layer?.name}</span>
-        </h5>
-
+      <div className="my-5 p-2 bg-black/5 rounded-sm border-dashed border-4 border-neutral-400/65">
         {layer?.design && layer?.aspectRatio && (
           <Cropper
-            classes={{ containerClassName: "bg-black" }}
+            classes={{ containerClassName: "bg-white" }}
             style={{
               containerStyle: {
-                borderRadius: "5px",
+                borderRadius: "0px",
                 height: 120,
                 width: "100%",
                 position: "relative",
@@ -117,7 +112,7 @@ FileUploadProps) {
           if (!result.src) return;
           updateLayer(layerId, { design: result.src });
         })}
-        className="w-full h-12 p-3 bg-neutral-700 hover:bg-neutral-800 transition-all duration-75 cursor-pointer rounded-md text-sm text-white/50 relative"
+        className="w-full h-12 p-3 bg-white hover:bg-neutral-50 border-neutral-300 border-2 transition-all duration-75 cursor-pointer rounded-md text-sm relative"
       />
     </div>
   );

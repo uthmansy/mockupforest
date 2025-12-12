@@ -44,21 +44,28 @@ export default async function MockupsPage({
   return (
     <>
       <Header />
-      <div className="py-8">
-        <section>
-          <Container>
-            <div className="max-w-max mx-auto">
-              <CategoriesList />
-            </div>
-          </Container>
-        </section>
-        <section className="py-5">
-          <Container>
-            <h1 className="text-2xl mb-10">All Free Mockups</h1>
-            <MockupGallery searchParams={searchParams} />
-          </Container>
-        </section>
-      </div>
+      <section className="bg-white py-5">
+        <Container>
+          <h1
+            style={{ fontFamily: "poppins" }}
+            className="text-5xl text-center uppercase mb-0 max-w-lg mx-auto leading-[1] font-light"
+          >
+            Best Online Mockup Generator
+          </h1>
+        </Container>
+      </section>
+      <section className="sticky top-20 z-30 bg-white">
+        <Container>
+          <div className="max-w-max mx-auto py-4">
+            <CategoriesList />
+          </div>
+        </Container>
+      </section>
+      <section className="py-8">
+        <Container>
+          <MockupGallery searchParams={searchParams} />
+        </Container>
+      </section>
       <Footer />
     </>
   );

@@ -18,13 +18,13 @@ export default function HeroSearch() {
   };
 
   return (
-    <div className="py-14 bg-milk">
+    <div className="bg-white">
       <Container>
         {/* Search Bar */}
-        <h1 className="text-5xl md:text-7xl font-normal leading-[1.1] uppercase">
-          Create Pro Mockups Right in the Browser.
+        <h1 className="text-5xl md:text-7xl font-normal leading-[1.1] uppercase text-center mb-0">
+          Premium Mockups in seconds
         </h1>
-        <div className="">
+        {/* <div className="">
           <Input
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -38,7 +38,7 @@ export default function HeroSearch() {
               ],
               innerWrapper: "bg-transparent",
               inputWrapper: [
-                "bg-white",
+                "bg-neutral-200",
                 // "dark:bg-default/60",
                 // "backdrop-blur-xl",
                 // "backdrop-saturate-200",
@@ -61,7 +61,7 @@ export default function HeroSearch() {
               </div>
             }
           />
-        </div>
+        </div> */}
       </Container>
     </div>
   );
