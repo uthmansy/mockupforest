@@ -9,25 +9,29 @@ import Footer from "@/components/Footer";
 import CategoriesList from "@/components/CategoriesList";
 
 interface Props {
-  params: { slug: string };
-  searchParams: { page?: string };
+  params: Promise<{ slug: string }>; // Now a Promise
+  searchParams: Promise<{ page?: string }>; // Now a Promise
 }
 
 export const revalidate = 60; // ISR: revalidates every 60s
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params; // Await here
   return {
-    title: `Category: ${params.slug.replace("-", " ")}`,
-    description: `Browse ${params.slug.replace("-", " ")} mockups`,
+    title: `Category: ${slug.replace("-", " ")}`,
+    description: `Browse ${slug.replace("-", " ")} mockups`,
   };
 }
 
-export default async function CategorySlugPage({
-  params,
-  searchParams,
-}: Props) {
-  const { slug } = params;
-  const normalizedSlug = slug.replace(/-/g, " "); // replace all hyphens with spaces
+export default async function CategorySlugPage(props: Props) {
+  const { params: paramsPromise, searchParams: searchParamsPromise } = props;
+  const { slug } = await paramsPromise; // Await params
+  const searchParams = await searchParamsPromise; // Await searchParams
+  const normalizedSlug = slug.replace(/-/g, " "); // Now safe
 
   const page = parseInt(searchParams.page || "1", 10);
   const itemsPerPage = 24;
@@ -39,7 +43,7 @@ export default async function CategorySlugPage({
     .select("id, categories, title, preview_url,slug, is_editable", {
       count: "exact",
     })
-    .contains("categories", [normalizedSlug]) // use normalized slug here
+    .contains("categories", [normalizedSlug]) // Now matches data
     .order("created_at", { ascending: false })
     .range(from, to);
 
