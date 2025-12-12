@@ -25,7 +25,7 @@ export default function Home({
   return (
     <>
       <Header />
-      <section className="mt-8">
+      <section className="my-8">
         <HeroSearch />
       </section>
       <section className="sticky top-20 z-30 bg-white">

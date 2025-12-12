@@ -39,7 +39,7 @@ const HeaderBar = ({ menuOpen, setMenuOpen }: HeaderBarProps) => {
         {/* Right side: Search and Hamburger */}
         <div className="flex items-center space-x-4">
           {/* Search Box - visible on both mobile and desktop */}
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 hidden md:block">
             <SearchBox />
           </div>
 

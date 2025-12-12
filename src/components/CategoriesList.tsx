@@ -35,7 +35,7 @@ export default function CategoriesList({ currentCat }: Props) {
 
   return (
     <div className="overflow-x-auto">
-      <ul className="flex space-x-3 px-6 list-none mb-0 py-3">
+      <ul className="flex space-x-3 list-none mb-0 pl-0">
         {categories.map(({ id, name, slug }) => {
           const isActive = activeCategory === slug;
 

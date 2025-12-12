@@ -26,7 +26,7 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-full rounded-lg overflow-hidden h-full border-r border-neutral-300 shadow-xl">
+    <aside className="w-full rounded-lg overflow-hidden h-full shadow-xl">
       {/* Header */}
       <div className="p-4 border-b border-white/10 pt-10">
         <div className="flex items-center justify-between mb-3">

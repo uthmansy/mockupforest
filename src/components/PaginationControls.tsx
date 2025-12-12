@@ -49,7 +49,7 @@ export default function PaginationControls({
       <Link
         key={page}
         href={href}
-        className={`h-12 w-12 flex items-center justify-center text-sm font-medium transition rounded-full ${
+        className={`md:h-12 h-10 w-12 flex items-center justify-center text-sm font-medium transition rounded-full ${
           isActive
             ? "bg-primary text-white"
             : "bg-neutral-100 text-gray-700 hover:bg-neutral-200"
@@ -63,25 +63,28 @@ export default function PaginationControls({
   return (
     <nav
       aria-label="Pagination"
-      className="flex flex-wrap justify-center items-center space-x-2 mt-10"
+      className="flex flex-nowrap justify-center items-center space-x-2 mt-10"
     >
       {/* Previous Button */}
       <Link
         href={currentPage > 1 ? buildHref(currentPage - 1) : ""}
-        className={`px-4 h-12 flex items-center text-sm font-medium transition rounded-full group ${
+        className={`px-4 md:h-12 h-10 flex items-center text-sm font-medium transition rounded-full group ${
           currentPage === 1
             ? "bg-neutral-200 text-gray-400 pointer-events-none"
             : "bg-primary text-white hover:bg-primary-dark"
         }`}
       >
         <BsArrowLeft className="text-xl mr-3 group-hover:mr-5 transition-all duration-150" />
-        Prev
+        <span className="hidden sm:inline">Prev</span>
       </Link>
 
       {/* Page Numbers */}
       {pages.map((p, idx) =>
         typeof p === "string" ? (
-          <span key={`sep-${idx}`} className="px-4 py-2 text-gray-500">
+          <span
+            key={`sep-${idx}`}
+            className="md:h-12 h-10 w-10 md:w-12 flex items-center justify-center text-gray-500"
+          >
             {p}
           </span>
         ) : (
@@ -92,13 +95,13 @@ export default function PaginationControls({
       {/* Next Button */}
       <Link
         href={currentPage < totalPages ? buildHref(currentPage + 1) : ""}
-        className={`px-4 h-12 flex items-center text-sm font-medium transition rounded-full group ${
+        className={`px-4 md:h-12 h-10 flex items-center text-sm font-medium transition rounded-full group ${
           currentPage === totalPages
             ? "bg-neutral-200 text-gray-400 pointer-events-none"
             : "bg-primary text-white hover:bg-primary-dark"
         }`}
       >
-        Next{" "}
+        <span className="hidden sm:inline">Next</span>
         <BsArrowRight className="text-xl ml-3 group-hover:ml-5 transition-all duration-150" />
       </Link>
     </nav>
