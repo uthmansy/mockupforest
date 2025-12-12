@@ -237,8 +237,8 @@ export default function AppHeader({ glRef, user, mockupData }: AppHeaderProps) {
                 <Image
                   src="/dark-logo.png"
                   alt="MockupForest logo"
-                  width={120}
-                  height={30}
+                  width={100}
+                  height={20}
                   priority
                 />
               </Link>

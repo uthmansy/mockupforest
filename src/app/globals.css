@@ -149,7 +149,7 @@ ol {
 }
 
 .mobile-bar__content {
-  @apply min-h-max text-white absolute bottom-24 right-0 left-0 z-10 bg-inherit;
+  @apply min-h-max text-black absolute bottom-24 right-0 left-0 z-10 bg-inherit;
 }
 
 .mobile-bar__panel {
@@ -165,15 +165,15 @@ ol {
 }
 
 .mobile-bar__navigation {
-  @apply h-24 border-white/40 border-t flex items-center justify-center space-x-8 text-white bg-inherit;
+  @apply h-[4rem] border-black/40 border-t flex items-center justify-center space-x-8 text-black bg-inherit;
 }
 
 .mobile-bar__tab {
-  @apply transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-lg p-2;
+  @apply transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-black/50 rounded-lg p-2;
 }
 
 .mobile-bar__tab-content {
-  @apply uppercase flex flex-col items-center space-y-2;
+  @apply uppercase flex flex-col items-center space-y-1;
 }
 
 .mobile-bar__tab-icon {
@@ -185,9 +185,9 @@ ol {
 }
 
 .mobile-bar__tab--active {
-  @apply text-white;
+  @apply text-black;
 }
 
 .mobile-bar__tab--inactive {
-  @apply text-white/50 hover:text-white/70;
+  @apply text-black/50 hover:text-black/70;
 }

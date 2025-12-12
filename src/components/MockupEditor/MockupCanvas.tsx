@@ -172,7 +172,7 @@ export const MockupCanvas: React.FC<MockupCanvasProps> = ({
       {/* ZOOM WRAPPER  */}
       <div
         onWheel={handleWheelZoom} // ← zoom event
-        className="relative flex items-center justify-center w-auto overflow-hidden h-[90%]"
+        className="relative flex items-center justify-center w-full max-w-md md:max-w-max md:w-auto overflow-hidden  h-auto md:h-[90%]"
         style={{
           aspectRatio,
           transform: `scale(${zoom})`, // ← apply zoom

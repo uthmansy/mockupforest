@@ -135,7 +135,7 @@ export default function MockupEditor({ mockupData }: Props) {
       <AppHeader glRef={glRef} mockupData={mockupData} user={user} />
       <div className="h-[calc(100vh-3rem)] flex flex-col md:flex-row overflow-hidden bg-neutral-300">
         {isLargeScreen && (
-          <div className="md:w-60 xl:w-72 h-full overflow-y-auto max-h-full border-gray-300 border-r-[0.5px] scrollbar-dark bg-white">
+          <div className="sm:w-60 xl:w-72 h-full overflow-y-auto max-h-full border-gray-300 border-r-[0.5px] scrollbar-dark bg-white">
             <Sidebar />
           </div>
         )}
@@ -148,7 +148,7 @@ export default function MockupEditor({ mockupData }: Props) {
           />
         </div>
         {isMobile && (
-          <div className="bg-neutral-700">
+          <div className="bg-white">
             <MobileBar />
           </div>
         )}
