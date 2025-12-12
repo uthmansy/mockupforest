@@ -65,7 +65,7 @@ export default function Sidebar() {
                 className="w-full px-4 py-3 flex items-center justify-between text-left transition-colors group"
                 aria-expanded={isExpanded}
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 flex-1 min-w-0">
                   <motion.div
                     animate={{ rotate: isExpanded ? 90 : 0 }}
                     className="h-4 w-4"
@@ -73,12 +73,13 @@ export default function Sidebar() {
                   >
                     <SlArrowRight className="text-sm" />
                   </motion.div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm uppercase truncate flex items-center">
+
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <span className="text-sm uppercase truncate inline-block min-w-0">
                       Layer{" "}
                       <span className="text-xs text-neutral-600 px-2 py-0.5 bg-neutral-200 mx-3 rounded">
                         {layer.id}
-                      </span>{" "}
+                      </span>
                       [{layer.name}]
                     </span>
                   </div>
