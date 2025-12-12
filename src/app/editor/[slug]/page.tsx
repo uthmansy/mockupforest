@@ -10,19 +10,27 @@ interface Props {
 }
 
 async function fetchMockupBySlug(slug: string) {
-  const { data, error } = await supabase
-    .from("mockups")
-    .select("*")
-    .eq("slug", slug)
-    .single();
+  try {
+    const { data, error } = await supabase
+      .from("mockups")
+      .select("*")
+      .eq("slug", slug)
+      .single();
 
-  if (error || !data) return null;
-  return data;
+    if (error || !data) return null;
+    return data;
+  } catch (err) {
+    console.error("Supabase fetch error:", err);
+    return null;
+  }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const mockup = await fetchMockupBySlug(params.slug);
-  if (!mockup) return { title: "Mockup Not Found" };
+
+  if (!mockup) {
+    return { title: "Mockup Not Found" };
+  }
 
   return {
     title: mockup.title,
@@ -35,9 +43,5 @@ export default async function MockupDetailPage({ params }: Props) {
 
   if (!mockup) return notFound();
 
-  return (
-    <>
-      <MockupEditor mockupData={mockup} />
-    </>
-  );
+  return <MockupEditor mockupData={mockup} />;
 }
