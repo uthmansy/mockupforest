@@ -19,7 +19,9 @@ interface Props {
 }
 
 export default async function MockupGallery({ searchParams }: Props) {
-  const page = parseInt(searchParams.page || "1", 10);
+  // const page = parseInt(searchParams.page || "1", 10); //doesnt work in next 16
+  const currentPage = Number(searchParams.page) || 1;
+  const page = Math.max(1, currentPage); // safety
   const itemsPerPage = 15;
   const from = (page - 1) * itemsPerPage;
   const to = from + itemsPerPage - 1;
