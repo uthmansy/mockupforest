@@ -1,3 +1,4 @@
+// app/mockup/[slug]/page.tsx (or wherever this file is)
 import MockupEditor from "@/components/MockupEditor";
 import { supabase } from "@/lib/supabaseClient";
 import { Metadata } from "next";
@@ -5,8 +6,9 @@ import { notFound } from "next/navigation";
 
 export const revalidate = 60;
 
+// Update the Props interface — params is now a Promise
 interface Props {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 async function fetchMockupBySlug(slug: string) {
@@ -25,8 +27,10 @@ async function fetchMockupBySlug(slug: string) {
   }
 }
 
+// generateMetadata must await params
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const mockup = await fetchMockupBySlug(params.slug);
+  const { slug } = await params; // ← Await here
+  const mockup = await fetchMockupBySlug(slug);
 
   if (!mockup) {
     return { title: "Mockup Not Found" };
@@ -38,8 +42,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+// Page component must be async and await params
 export default async function MockupDetailPage({ params }: Props) {
-  const mockup = await fetchMockupBySlug(params.slug);
+  const { slug } = await params; // ← Await here
+  const mockup = await fetchMockupBySlug(slug);
 
   if (!mockup) return notFound();
 
