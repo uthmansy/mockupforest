@@ -29,7 +29,7 @@ export default function CategoriesList({ currentCat }: Props) {
   const activeCategory = currentCat || "all";
 
   const baseClasses =
-    "flex flex-col items-center text-center transition rounded-full py-3 px-4 border-dashed border border-primary";
+    "flex flex-col items-center text-center transition rounded-full py-2 px-3 md:py-3 md:px-4 border-dashed border border-primary";
   const activeClasses = "bg-primary text-white font-medium";
   const inactiveClasses = "bg-neutral-100 text-black hover:text-primary";
 

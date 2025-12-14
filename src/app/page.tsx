@@ -21,7 +21,7 @@ export default async function Home({
   return (
     <>
       <Header />
-      <section className="my-8">
+      <section className="my-5">
         <HeroSearch />
       </section>
       <section className="sticky top-20 z-30 bg-white">

@@ -3,7 +3,6 @@
 import React, { useRef, useState } from "react";
 import { useLayersStore } from "@/app/stores/useLayersStore";
 import Cropper, { Area } from "react-easy-crop";
-import { LuImage } from "react-icons/lu";
 
 interface FileUploadProps {
   label: string;

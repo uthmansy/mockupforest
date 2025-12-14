@@ -22,6 +22,8 @@
   --color-secondary-bg: #eae3d3;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-mono: var(--font-geist-mono);
+  --font-cinzel: var(--font-cinzel), sans-serif;
 }
 /* 
 @media (prefers-color-scheme: dark) {

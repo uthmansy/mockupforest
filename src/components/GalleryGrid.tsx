@@ -26,7 +26,7 @@ export default function GalleryGrid({ mockups }: GalleryGridProps) {
               {item.isEditable && (
                 <Link
                   href={`/editor/${item.slug}`}
-                  className="h-12 w-12 flex items-center justify-center bg-white rounded-lg shadow-lg text-primary hover:bg-lime-100 transition-colors"
+                  className="h-10 w-10 flex items-center justify-center bg-black/50 rounded-lg shadow-lg text-white/80 hover:bg-black/40 transition-colors"
                 >
                   <FiEdit2 className="text-xl" />
                 </Link>
@@ -34,7 +34,7 @@ export default function GalleryGrid({ mockups }: GalleryGridProps) {
               {item.downloadUrl && (
                 <Link
                   href={`/mockups/${item.slug}`}
-                  className="h-12 w-12 flex items-center justify-center bg-white rounded-lg shadow-lg text-primary hover:bg-lime-100 transition-colors"
+                  className="h-10 w-10 flex items-center justify-center bg-black/50 rounded-lg shadow-lg text-white/80 hover:bg-black/40 transition-colors"
                 >
                   <BsFiletypePsd className="text-2xl" />
                 </Link>

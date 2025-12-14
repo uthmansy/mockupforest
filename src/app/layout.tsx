@@ -1,13 +1,17 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import { Poppins } from "next/font/google";
+import { Inter, Inter_Tight, Cinzel, Poppins } from "next/font/google";
 import Script from "next/script";
 import { Providers } from "./providers";
 
-const inter = Inter({
+const inter = Inter_Tight({
   subsets: ["latin"],
   variable: "--font-inter",
+});
+
+const cinzel = Cinzel({
+  subsets: ["latin"],
+  variable: "--font-cinzel",
 });
 
 const poppins = Poppins({
@@ -33,7 +37,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${poppins.variable}`}>
+    <html
+      lang="en"
+      className={`${inter.variable} ${poppins.variable} ${cinzel.variable}`}
+    >
       <head>
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-FV21ZFQTVF"
