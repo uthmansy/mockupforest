@@ -109,6 +109,7 @@ export const ColorLayer: React.FC<ColorLayerProps> = ({
         transparent
         depthTest
         depthWrite={false}
+        key={`${shadowIntensity}-${highlightIntensity}-${noiseAmount}`}
         uniforms={{
           maskTexture: { value: maskTex.current },
           baseTexture: { value: global.baseTexture },
