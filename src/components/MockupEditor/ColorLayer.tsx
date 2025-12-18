@@ -149,7 +149,7 @@ export const ColorLayer: React.FC<ColorLayerProps> = ({
 
             float brightness = dot(baseCol, vec3(0.3333));
             float mid = 0.35;
-            float t = smoothstep(mid - 0.3, mid + 0.67, brightness);
+            float t = smoothstep(mid - 0.35, mid + 0.65, brightness);
 
             float low = pow(brightness, 1.2) * 1.5;
             float high = 0.2 + (brightness - 0.55);
@@ -166,6 +166,7 @@ export const ColorLayer: React.FC<ColorLayerProps> = ({
               shadowIntensity * mix(1.0, 1.25, smoothstep(0.6, 1.0, colorBrightness));
 
             vec3 shadowed = calibratedColor * mix(1.0 - adaptiveShadowIntensity, 1.0, normalized);
+            // vec3 shadowed = calibratedColor * (1.0 - adaptiveShadowIntensity) * normalized * 5.0;
             float highlightBoost = (1.0 - colorBrightness) * 0.5;
             vec3 highlighted = calibratedColor + baseCol * smoothstep(0.2, 1.0, normalized) * highlightIntensity * (1.0 + highlightBoost);
 
@@ -173,7 +174,7 @@ export const ColorLayer: React.FC<ColorLayerProps> = ({
             finalCol = clamp(finalCol, 0.0, 1.0);
             finalCol = max(finalCol, calibratedColor * 0.3);
 
-            float alpha = smoothstep(0.1, 0.3, mask.r);
+            float alpha = smoothstep(0.02, 0.98, mask.r);
 
             // Apply gamma correction to linear color
             finalCol = pow(finalCol, vec3(1.0 / 2.2));
