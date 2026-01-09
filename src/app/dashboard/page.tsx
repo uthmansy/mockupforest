@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Sidebar from "@/components/Dashboard/Sidebar";
-import Header from "@/components/Dashboard/Header";
 import Content from "@/components/Dashboard/Content";
 import { useAuthRedirect } from "../hooks/useAuthRedirect";
+import Header from "@/components/Header";
+import { getAuthSession } from "@/helpers/functions";
+import { User } from "@supabase/supabase-js";
 
 // Define the different content types
 export type ContentType =
@@ -17,7 +19,6 @@ export type ContentType =
   | "calendar";
 
 export default function Dashboard() {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeContent, setActiveContent] = useState<ContentType>("dashboard");
 
   const { loading, user } = useAuthRedirect();
@@ -26,16 +27,17 @@ export default function Dashboard() {
   if (!user) return null;
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <Sidebar
-        sidebarOpen={sidebarOpen}
-        activeContent={activeContent}
-        setActiveContent={setActiveContent}
-      />
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-        <Content activeContent={activeContent} />
+    <>
+      <Header />
+      <div className="flex h-[calc(100vh-5rem)] bg-gray-50">
+        <Sidebar
+          activeContent={activeContent}
+          setActiveContent={setActiveContent}
+        />
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <Content activeContent={activeContent} />
+        </div>
       </div>
-    </div>
+    </>
   );
 }

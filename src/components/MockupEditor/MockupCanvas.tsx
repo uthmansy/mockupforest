@@ -210,25 +210,6 @@ export const MockupCanvas: React.FC<MockupCanvasProps> = ({
           <BaseLayer height={canvasHeight} width={canvasWidth} src={base} />
 
           {renderedLayers}
-          {/*
-          <EffectComposer>
-             <DepthOfField
-              focusDistance={0}
-              focalLength={0.02}
-              bokehScale={2}
-              height={480}
-            /> */}
-          {/* <Bloom
-              luminanceThreshold={0}
-              luminanceSmoothing={0.9}
-              height={300}
-            /> 
-            {/* <Noise opacity={0.02} /> */}
-          {/* <BrightnessContrast
-              brightness={0.0} // brightness. min: -1, max: 1
-              contrast={0.3} // contrast: min -1, max: 1
-            /> */}
-          {/* </EffectComposer> */}
         </Canvas>
       </div>
     </div>

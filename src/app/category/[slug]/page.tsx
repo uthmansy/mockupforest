@@ -43,8 +43,9 @@ export default async function CategorySlugPage(props: Props) {
     .select("id, categories, title, preview_url,slug, is_editable", {
       count: "exact",
     })
+    .eq("is_editable", true)
     .contains("categories", [normalizedSlug]) // Now matches data
-    .order("created_at", { ascending: false })
+    .order("rank_score", { ascending: false })
     .range(from, to);
 
   if (error) {
@@ -65,14 +66,14 @@ export default async function CategorySlugPage(props: Props) {
   return (
     <>
       <Header />
-      <section className="sticky top-20 z-30 bg-white">
+      <section className="sticky top-20 z-30 bg-white py-12">
         <Container>
-          <div className="max-w-max mx-auto py-4">
+          <div className="max-w-max mx-auto ">
             <CategoriesList currentCat={slug} />
           </div>
         </Container>
       </section>
-      <main className="py-8">
+      <main className="">
         <Container>
           <GalleryGrid mockups={mockups} />
           <PaginationControls

@@ -15,11 +15,11 @@ export default function SearchBox() {
   };
 
   return (
-    <div className="relative">
+    <div className="relative max-w-lg mx-auto w-full">
       <input
         type="text"
         placeholder="Search mockups..."
-        className="pl-10 pr-4 py-2.5 w-64  text-sm bg-gray-50 border-2 border-gray-400 rounded-xl"
+        className="pl-10 pr-4 py-3.5 w-full text-sm bg-neutral-200 rounded-xl"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         onKeyDown={handleKeyDown}

@@ -21,17 +21,17 @@ export default async function Home({
   return (
     <>
       <Header />
-      <section className="my-5">
+      <section className="mt-14">
         <HeroSearch />
       </section>
       <section className="sticky top-20 z-30 bg-white">
         <Container>
-          <div className="max-w-max mx-auto py-4">
+          <div className="max-w-max mx-auto py-6">
             <CategoriesList />
           </div>
         </Container>
       </section>
-      <section className="py-8">
+      <section className="py-10">
         <Container>
           <MockupGallery searchParams={searchParams} />
         </Container>

@@ -4,6 +4,7 @@ import { Mockup } from "./MockupGallery";
 import Image from "next/image";
 import { FiEdit2 } from "react-icons/fi";
 import { BsFiletypePsd } from "react-icons/bs";
+import { CiBookmark, CiHeart } from "react-icons/ci";
 
 interface GalleryGridProps {
   mockups: Mockup[];
@@ -15,7 +16,7 @@ export default function GalleryGrid({ mockups }: GalleryGridProps) {
       {mockups.map((item, index) => (
         <div
           key={`${item.id}${index}`}
-          className="group rounded-lg overflow-hidden bg-neutral-100 relative"
+          className="group rounded-lg overflow-hidden relative bg-neutral-100"
         >
           {/* Hover Overlay (Free + Edit) */}
           <div className="z-20 absolute top-0 left-0 right-0 p-5 flex space-x-2 justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -47,7 +48,7 @@ export default function GalleryGrid({ mockups }: GalleryGridProps) {
             href={`${item.isEditable ? "/editor/" : "/mockups/"}${item.slug}`}
           >
             <div className="relative w-full aspect-[1/1.3] rounded-xl overflow-hidden group">
-              <div className="absolute inset-0 bg-black/35 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div>
+              <div className="absolute inset-0  opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div>
 
               <Image
                 src={item.thumbnailUrl}
@@ -61,15 +62,22 @@ export default function GalleryGrid({ mockups }: GalleryGridProps) {
               />
             </div>
 
-            {/* <div className="px-3 py-5">
+            <div className="flex items-center justify-between space-x-2 px-3 py-3">
               <h3
-                className="truncate text-sm text-black uppercase mb-0 font-medium"
+                className="truncate text-[1rem] capitalize text-neutral-600 mb-0 flex-1 max-w-[200px]"
                 title={item.title}
               >
-                {item.title?.split(" ").slice(0, 6).join(" ")}
-                {item.title?.split(" ").length > 6 && " ..."}
+                {item.title
+                  ?.replace(/-/g, " ") // replace all hyphens with spaces
+                  .split(" ")
+                  .slice(0, 6)
+                  .join(" ")}
+                {item.title?.replace(/-/g, " ").split(" ").length > 6 && " ..."}
               </h3>
-            </div> */}
+              <div className="text-2xl text-black flex">
+                <CiBookmark />
+              </div>
+            </div>
           </Link>
         </div>
       ))}

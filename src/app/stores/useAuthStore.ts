@@ -2,27 +2,28 @@
 
 import { create } from "zustand";
 import { supabase } from "@/lib/supabaseClient";
+import { User } from "@supabase/supabase-js";
 
-interface User {
-  id: string;
-  email?: string;
-  // Add other user properties you expect
-}
+// interface User {
+//   id: string;
+//   email?: string;
+//   // Add other user properties you expect
+// }
 
 interface AuthState {
-  user: User | null;
+  user: User | undefined;
   loading: boolean;
   error: string | null;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
-  setUser: (user: User | null) => void;
+  setUser: (user: User | undefined) => void;
   checkLoginStatus: () => Promise<boolean>;
   getUserProfile: () => Promise<void>;
   clearError: () => void;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
-  user: null,
+  user: undefined,
   loading: false,
   error: null,
 
@@ -66,7 +67,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ loading: true });
     try {
       await supabase.auth.signOut();
-      set({ user: null, loading: false, error: null });
+      set({ user: undefined, loading: false, error: null });
     } catch (error: any) {
       set({ error: error.message, loading: false });
     }
@@ -83,7 +84,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       if (error) {
         console.error("Session error:", error);
-        set({ user: null, loading: false });
+        set({ user: undefined, loading: false });
         return false;
       }
 
@@ -95,11 +96,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         return true;
       }
 
-      set({ user: null, loading: false });
+      set({ user: undefined, loading: false });
       return false;
     } catch (error: any) {
       console.error("Check login status error:", error);
-      set({ user: null, loading: false, error: error.message });
+      set({ user: undefined, loading: false, error: error.message });
       return false;
     }
   },

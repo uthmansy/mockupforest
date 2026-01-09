@@ -21,7 +21,7 @@ export default function HeroSearch() {
     <div className="bg-white">
       <Container>
         {/* Search Bar */}
-        <h1 className="text-3xl sm:text-4xl md:text-5xl uppercase leading-[1.1] text-neutral-800 text-center mb-0">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl uppercase leading-[1.1] text-neutral-700 text-center mb-0 font-cinzel">
           Pro Mockups in seconds
         </h1>
         {/* <div className="">

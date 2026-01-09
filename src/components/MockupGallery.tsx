@@ -27,10 +27,9 @@ export default async function MockupGallery({ searchParams }: Props) {
     : Number(pageParam) || 1;
 
   const safePage = Math.max(1, page);
-  const itemsPerPage = 15;
+  const itemsPerPage = 25;
   const from = (safePage - 1) * itemsPerPage;
   const to = from + itemsPerPage - 1;
-  console.log(page);
   // Fetch paginated mockups
   const { data, error, count } = await supabase
     .from("mockups")
@@ -41,7 +40,7 @@ export default async function MockupGallery({ searchParams }: Props) {
       }
     )
     .eq("is_editable", true)
-    .order("created_at", { ascending: false })
+    .order("rank_score", { ascending: false })
     .range(from, to);
 
   if (error) {

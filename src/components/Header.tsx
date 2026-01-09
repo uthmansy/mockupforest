@@ -1,12 +1,25 @@
 "use client";
 
 import Link from "next/link";
-import { Dispatch, SetStateAction, useState } from "react";
-import { X } from "lucide-react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import Container from "./Container";
 import Image from "next/image";
 import SearchBox from "./SearchBox";
 import { VscChromeClose, VscMenu } from "react-icons/vsc";
+import {
+  Avatar,
+  Button,
+  useDisclosure,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  cn,
+  DropdownItem,
+} from "@heroui/react";
+import { HiOutlineLockClosed } from "react-icons/hi2";
+import LoginModal from "./LoginModal";
+import { useAuthStore } from "@/app/stores/useAuthStore";
+import { useAuthRedirect } from "@/app/hooks/useAuthRedirect";
 
 const NAV_ITEMS = [
   { label: "Home", href: "/" },
@@ -22,8 +35,18 @@ interface HeaderBarProps {
 }
 
 const HeaderBar = ({ menuOpen, setMenuOpen }: HeaderBarProps) => {
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const { checkLoginStatus, user } = useAuthStore();
+
+  useEffect(() => {
+    checkLoginStatus();
+  }, []);
+
+  const { signingOut, onSignOut } = useAuthRedirect();
+
   return (
     <Container>
+      <LoginModal isOpen={isOpen} onOpen={onOpen} onOpenChange={onOpenChange} />
       <div className="flex items-center justify-between py-4">
         {/* Logo */}
         <Link href="/" className="flex-shrink-0">
@@ -35,14 +58,58 @@ const HeaderBar = ({ menuOpen, setMenuOpen }: HeaderBarProps) => {
             priority
           />
         </Link>
-
+        {/* Search Box - visible on both mobile and desktop */}
+        <div className="flex-shrink-0 flex-grow hidden md:block">
+          <SearchBox />
+        </div>
         {/* Right side: Search and Hamburger */}
         <div className="flex items-center space-x-4">
-          {/* Search Box - visible on both mobile and desktop */}
-          <div className="flex-shrink-0 hidden md:block">
-            <SearchBox />
-          </div>
-
+          {!user ? (
+            <>
+              <Button
+                // showAnchorIcon
+                as={Link}
+                // color="black"
+                href="/login"
+                // variant="solid"
+                size="lg"
+                radius="full"
+                variant="bordered"
+              >
+                <HiOutlineLockClosed className="text-xl" />
+                Log in
+              </Button>
+            </>
+          ) : (
+            <>
+              <Dropdown>
+                <DropdownTrigger>
+                  <Avatar
+                    className="cursor-pointer"
+                    showFallback
+                    isBordered
+                    src={user?.user_metadata.avatar_url}
+                    name={user?.user_metadata.name}
+                  />
+                </DropdownTrigger>
+                <DropdownMenu
+                  aria-label="Dropdown menu with icons"
+                  variant="faded"
+                >
+                  <DropdownItem key="dashboard">
+                    <Link href={"/dashboard"}>Dashboard</Link>
+                  </DropdownItem>
+                  <DropdownItem
+                    onPress={onSignOut}
+                    // isLoading={signingOut}
+                    key="logout"
+                  >
+                    Sign Out
+                  </DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
+            </>
+          )}
           {/* Hamburger Menu Button */}
           <button
             className="p-2 text-gray-700 hover:text-black transition cursor-pointer hover:bg-gray-100 rounded-xl"
@@ -65,7 +132,7 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 bg-white h-[5rem]">
+    <header className="sticky top-0 z-50 bg-white h-[5rem] border-b border-neutral-200 ">
       <HeaderBar menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
       {/* Dropdown Menu - Full Width for both mobile and desktop */}
       {menuOpen && (

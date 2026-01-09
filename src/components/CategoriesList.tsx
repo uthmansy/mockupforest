@@ -29,14 +29,14 @@ export default function CategoriesList({ currentCat }: Props) {
   const activeCategory = currentCat || "all";
 
   const baseClasses =
-    "flex flex-col items-center text-center transition rounded-full py-2 px-3 md:py-3 md:px-4 border-dashed border border-primary";
+    "flex space-x-2 items-center text-center transition rounded-full py-2 px-3 md:py-3 md:px-4";
   const activeClasses = "bg-primary text-white font-medium";
-  const inactiveClasses = "bg-neutral-100 text-black hover:text-primary";
+  const inactiveClasses = "bg-neutral-200 text-black hover:text-primary";
 
   return (
     <div className="overflow-x-auto">
       <ul className="flex space-x-3 list-none mb-0 pl-0">
-        {categories.map(({ id, name, slug }) => {
+        {categories.map(({ id, name, slug, Icon }) => {
           const isActive = activeCategory === slug;
 
           // Special case: ALL → /mockups
@@ -64,6 +64,7 @@ export default function CategoriesList({ currentCat }: Props) {
                   isActive ? activeClasses : inactiveClasses
                 }`}
               >
+                <span className="text-xl">{Icon}</span>
                 <span className="text-sm">{name}</span>
               </Link>
             </li>

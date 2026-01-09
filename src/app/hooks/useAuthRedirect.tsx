@@ -1,34 +1,55 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
+import { getAuthSession, signOut } from "@/helpers/functions";
+import { User } from "@supabase/supabase-js";
 import { useAuthStore } from "../stores/useAuthStore";
+
+const PROTECTED_PATHS = ["/dashboard"];
+
+const isProtectedRoute = (pathname: string) =>
+  PROTECTED_PATHS.some(
+    (route) => pathname === route || pathname.startsWith(`${route}/`)
+  );
 
 export function useAuthRedirect() {
   const router = useRouter();
-  const { loading, user, checkLoginStatus } = useAuthStore();
-  const [initialCheckDone, setInitialCheckDone] = useState(false);
+  const pathname = usePathname();
+
+  const [user, setUser] = useState<User | undefined>();
+  const [loading, setLoading] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
+  const [signedOut, setSignedOut] = useState(false);
+
+  const { setUser: setStoreUser } = useAuthStore();
+
+  const onSignOut = async () => {
+    setSigningOut(true);
+    try {
+      await signOut();
+      setSignedOut(true);
+    } finally {
+      setSigningOut(false);
+    }
+  };
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const isAuthenticated = await checkLoginStatus();
+    const getSession = async () => {
+      setLoading(true);
+      const session = await getAuthSession();
+      setLoading(false);
 
-      if (!isAuthenticated) {
-        console.log("Not authenticated, redirecting to login");
+      setUser(session?.user);
+      setStoreUser(session?.user);
+
+      if (!session?.user && isProtectedRoute(pathname)) {
         router.push("/login");
       }
-
-      setInitialCheckDone(true);
     };
 
-    checkAuth();
-  }, [checkLoginStatus, router]);
+    getSession();
+  }, [router, pathname, signedOut]);
 
-  // Return loading state that includes the initial check
-  const isLoading = loading || !initialCheckDone;
-
-  return {
-    loading: isLoading,
-    user,
-  };
+  return { loading, user, signingOut, onSignOut };
 }
